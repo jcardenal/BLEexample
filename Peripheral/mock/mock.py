@@ -54,7 +54,6 @@ class Mock:
             return None
         return func
 
-
     def _get_return_value(self, method_name, parameters):
         if parameters in self._calls_matching[method_name]['params']:
             index = self._calls_matching[method_name]['params'].index(parameters)
@@ -64,7 +63,7 @@ class Mock:
             return self._calls_matching[method_name]['return_values'][index]
 
 
-def createMock(cls = None):
+def create_mock(cls = None):
     newMock = Mock()
     if cls is not None:
         for attr in dir(cls):
