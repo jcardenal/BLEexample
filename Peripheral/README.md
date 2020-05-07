@@ -35,9 +35,9 @@ Good question! The problem is that the requirements for running `unittest.mock` 
 
 * Create a mock object from a real `micropython` class:
 
-		from mock import Mock, createMockFor
+		from mock import Mock, create_mock
 		from bluetooth import BLE
-		mockBLE = createMockFor(BLE)
+		mockBLE = create_mock(BLE)
 		assert isinstance(mockBLE, Mock)
 		assert not isinstance(mockBLE, BLE)
 
@@ -47,7 +47,7 @@ Good question! The problem is that the requirements for running `unittest.mock` 
 
 * Set expected values to return depending on arguments:
 
-		mockBLE.when('active', args, return_value = True) # return True on mockBLE.active(**args)
+		mockBLE.when('active', (True,), return_value = True) # return True on mockBLE.active(True)
 		mockBLE.when('active', return_value = False) # else, return False
 
 * Set expectations on invocations on the mock:
@@ -56,6 +56,7 @@ Good question! The problem is that the requirements for running `unittest.mock` 
 		assert mockBLE.hasBeenCalled(times = 3) # three times
 		assert mockBLE.hasBeenCalled(method = 'active', times = 2) # BLE.active has been called twice
 		assert mockBLE.hasBeenCalledWith(method = 'active', args) # BLE.active has been called with these parameters
+		assert mockBLE.hasBeenCalledWith(method = 'active', args, times=2) # BLE.active has been called with these parameters, twice
 
 * Mock reset:
 		from mock import createMockFor
