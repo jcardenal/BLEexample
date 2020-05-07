@@ -1,3 +1,7 @@
+"""
+    Mocks creating module
+"""
+
 class Mock:
     def __init__(self):
         self._calls_matching = {}
