@@ -47,25 +47,25 @@ class Mock:
                 self._actual_parameters.append(())
             if method_name in self._calls_matching.keys():
                 if args:
-                    return self._get_return_value(method_name, args)
+                    return self._get_return_value_or_raise_exception(method_name, args)
                 elif kwargs:
-                    return self._get_return_value(method_name, kwargs)
+                    return self._get_return_value_or_raise_exception(method_name, kwargs)
                 else:
-                    return self._get_return_value(method_name, None)
+                    return self._get_return_value_or_raise_exception(method_name, None)
             return None
         return func
 
-    def _get_return_value(self, method_name, parameters):
+    def _get_return_value_or_raise_exception(self, method_name, parameters):
         if parameters in self._calls_matching[method_name]['params']:
-            index = self._calls_matching[method_name]['params'].index(parameters)
-            if self._calls_matching[method_name]['raise_exception'][index] is not None:
-                raise self._calls_matching[method_name]['raise_exception'][index]
-            return self._calls_matching[method_name]['return_values'][index]
+            return self._on_parameters_get_return_value_or_raise(method_name, parameters)
         elif None in self._calls_matching[method_name]['params']:
-            index = self._calls_matching[method_name]['params'].index(None)
-            if self._calls_matching[method_name]['raise_exception'][index] is not None:
-                raise self._calls_matching[method_name]['raise_exception'][index]
-            return self._calls_matching[method_name]['return_values'][index]
+            return self._on_parameters_get_return_value_or_raise(method_name, None)
+
+    def _on_parameters_get_return_value_or_raise(self, method_name, parameters):
+        index = self._calls_matching[method_name]['params'].index(parameters)
+        if self._calls_matching[method_name]['raise_exception'][index] is not None:
+            raise self._calls_matching[method_name]['raise_exception'][index]
+        return self._calls_matching[method_name]['return_values'][index]
 
 
 def create_mock(cls=None):
