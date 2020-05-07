@@ -12,6 +12,23 @@ See [Getting started with MicroPython on the ESP32](https://docs.micropython.org
 * [ubluetooth](https://docs.micropython.org/en/latest/library/ubluetooth.html) micropython module
 * [mock](#Mock) see below
 
+# Implemented behaviour
+
+What does this BLE test implementation? Well, not much. In addition, the behaviour was implemented
+following a phased approach:
+
+### Initial implementation
+
+* Register a service for [Battery Service](https://www.bluetooth.org/docman/handlers/downloaddoc.ashx?doc_id=245138)
+* Advertise the service
+* Allow a central to connect to the peripheral and read the value
+
+### Improvements
+
+* Add descriptors for the characteristics
+* Read the value for the battery level from an ADC connected to a potentiometer
+* Notify the central(s) when the battery level changes, asynchronously
+
 
 # Interesting pointers
 
