@@ -73,6 +73,20 @@ Good question! The problem is that the requirements for running `unittest.mock` 
 
 * [OPTIONAL] Set assertions on order of calls on the mock
 
+## Installing and using
+
+Just copy the `mock` module to your `micropython` linux installation.
+
+For instance, if `micropython` looks for installed modules and libraries in:
+
+        ~/.micropython/lib
+        
+copy the `mock` folder in this project to that location.
+
+Once available to `micropython`'s linux port, the module can be used **in tests** as:
+
+        from mock import create_mock, Mock
+        
 
 
 
