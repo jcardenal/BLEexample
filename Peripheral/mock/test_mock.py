@@ -67,7 +67,33 @@ class MockTestCase(unittest.TestCase):
         test_mock.method1('a', 'b')
         self.assertTrue(test_mock.has_been_called(times=3))
 
+    def test_should_count_times_has_been_called_each_method(self):
+        test_mock = createMock(TestClass)
+        self.assertFalse(test_mock.has_been_called())
+        test_mock.method1()
+        self.assertTrue(test_mock.has_been_called(method='method1', times=1))
+        test_mock.method2()
+        self.assertTrue(test_mock.has_been_called(method='method2', times=1))
+        test_mock.method1('a', 'b')
+        self.assertTrue(test_mock.has_been_called(method='method1', times=2))
 
+    def test_should_count_times_has_been_called_each_method_with_parameters(self):
+        test_mock = createMock(TestClass)
+        self.assertFalse(test_mock.has_been_called())
+        test_mock.method1()
+        test_mock.method1()
+        self.assertTrue(test_mock.has_been_called_with('method1', ()))
+        self.assertTrue(test_mock.has_been_called_with('method1', (), times=2))
+        self.assertFalse(test_mock.has_been_called_with('method1', (), times=3))
+        test_mock.method2('a')
+        self.assertTrue(test_mock.has_been_called_with('method2', ('a',)))
+        test_mock.method1('a', 'b')
+        self.assertTrue(test_mock.has_been_called_with('method1', ('a', 'b'), times=1))
+        self.assertFalse(test_mock.has_been_called_with('method1', ('a', 'c'), times=0))
+        test_mock.method2(arg2=0, arg1='1')
+        self.assertTrue(test_mock.has_been_called_with('method2', {'arg1': '1', 'arg2': 0}))
+        self.assertTrue(test_mock.has_been_called_with('method2', {'arg1': '1', 'arg2': 0}, times=1))
+        self.assertFalse(test_mock.has_been_called_with('method2', {'arg1': '1', 'arg2': 1}))
 
 if __name__ == '__main__':
     unittest.main()
