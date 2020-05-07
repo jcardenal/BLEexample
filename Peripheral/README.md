@@ -68,6 +68,9 @@ Good question! The problem is that the requirements for running `unittest.mock` 
 		mockBLE.reset()
 		assert not mockBLE.hasBeenCalled()
 
+* Set expectations on raising exceptions:
+		mockBLE.when('active', (True,), raise=OSError) # raise OSError on mockBLE.active(True)
+
 * [OPTIONAL] Set assertions on order of calls on the mock
 
 

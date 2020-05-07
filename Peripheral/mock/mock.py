@@ -4,11 +4,12 @@ class Mock:
         self._actual_calls = []
         self._actual_parameters = []
 
-    def when(self, method_name, required_args=None, return_value=None):
+    def when(self, method_name, required_args=None, return_value=None, raise_exception=None):
         if method_name not in self._calls_matching.keys():
-            self._calls_matching[method_name] = {'params': [], 'return_values': []}
+            self._calls_matching[method_name] = {'params': [], 'return_values': [], 'raise_exception': []}
         self._calls_matching[method_name]['params'].append(required_args)
         self._calls_matching[method_name]['return_values'].append(return_value)
+        self._calls_matching[method_name]['raise_exception'].append(raise_exception)
 
     def has_been_called(self, times=1, method=None):
         if method is None:
@@ -57,13 +58,17 @@ class Mock:
     def _get_return_value(self, method_name, parameters):
         if parameters in self._calls_matching[method_name]['params']:
             index = self._calls_matching[method_name]['params'].index(parameters)
+            if self._calls_matching[method_name]['raise_exception'][index] is not None:
+                raise self._calls_matching[method_name]['raise_exception'][index]
             return self._calls_matching[method_name]['return_values'][index]
         elif None in self._calls_matching[method_name]['params']:
             index = self._calls_matching[method_name]['params'].index(None)
+            if self._calls_matching[method_name]['raise_exception'][index] is not None:
+                raise self._calls_matching[method_name]['raise_exception'][index]
             return self._calls_matching[method_name]['return_values'][index]
 
 
-def create_mock(cls = None):
+def create_mock(cls=None):
     newMock = Mock()
     if cls is not None:
         for attr in dir(cls):

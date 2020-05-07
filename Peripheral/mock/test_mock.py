@@ -45,6 +45,11 @@ class MockTestCase(unittest.TestCase):
         self.assertEqual(test_mock.method1(), True)
         self.assertIsNone(test_mock.method2())
 
+    def test_should_raise_OSError(self):
+        test_mock = create_mock(TestClass)
+        test_mock.when('method1', raise_exception=OSError)
+        with self.assertRaises(OSError): test_mock.method1('a', 2)
+
     def test_should_allow_default_ret_value_and_specific_ret_value(self):
         test_mock = create_mock(TestClass)
         test_mock.when('method1', return_value=36)
@@ -53,6 +58,15 @@ class MockTestCase(unittest.TestCase):
         self.assertEqual(test_mock.method1('ok'), 36)
         self.assertEqual(test_mock.method1('a', 7), 11)
         self.assertEqual(test_mock.method1('a', 9), 36)
+
+    def test_should_raise_OSError_or_not_depending_on_arguments(self):
+        test_mock = create_mock(TestClass)
+        test_mock.when('method1', ('a', 2), raise_exception=OSError)
+        test_mock.when('method1', ('b', 'c'), return_value=12)
+        test_mock.when('method1', return_value='hi')
+        with self.assertRaises(OSError): test_mock.method1('a', 2)
+        self.assertEqual(test_mock.method1('b', 'c'), 12)
+        self.assertEqual(test_mock.method1(1,1), 'hi')
 
     def test_should_have_been_called(self):
         test_mock = create_mock(TestClass)
