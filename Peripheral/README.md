@@ -27,9 +27,9 @@ following a phased approach:
 
 ### Improvements (some of them already implemented)
 
-* Allow multiple connections from centrals 
+* Allow multiple connections from centrals
+* Notify the central(s) when the battery level changes, asynchronously 
 * Read the value for the battery level from an ADC connected to a potentiometer
-* Notify the central(s) when the battery level changes, asynchronously
 * Add descriptors for the characteristics
 
 
