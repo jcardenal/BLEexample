@@ -7,8 +7,10 @@ from mock.mock import create_mock, Mock
 from bluetooth import BLE, UUID, FLAG_READ, FLAG_NOTIFY
 from ble_service import BatteryService, BATTERY_SERVICE_APPEARANCE
 from ble_advertising import advertising_payload
+from micropython import const
 
 MOCK_BATTERY_LEVEL_HANDLE = 111
+_IRQ_CENTRAL_DISCONNECT = const(1 << 1)
 
 
 def _create_expected_services():
@@ -82,15 +84,15 @@ class BLEServiceTestCase(unittest.TestCase):
         self.assertEqual(service.read_battery_level_percentage(), 10)
 
 
-def test_should_set_handler_for_events(self):
+    def test_should_restart_advertising_after_disconnect(self):
+        disconnect_data = (123, 'A_type', 'address')
         service = BatteryService(self.mockBLE)
-        service.register_services()
-
-        def bt_irq():
-            pass
-
-        service.start(bt_irq)
-        self.assertTrue(self.mockBLE.has_been_called_with('irq', (bt_irq,), times=1))
+        # testing 'private' method !!
+        self.assertTrue(self.mockBLE.has_been_called(method='irq', times=1))
+        service._irq_handler(_IRQ_CENTRAL_DISCONNECT, disconnect_data)
+        self.assertTrue(self.mockBLE.has_been_called_with('gap_advertise', {'interval_us': 500000,
+                                                                        'adv_data': _create_expected_advertising_payload()},
+                                                      times=1))
 
 
 if __name__ == '__main__':

@@ -23,6 +23,7 @@ following a phased approach:
 * Advertise the service, including advertising payload
 * Allow a central to connect to the peripheral and read the value
 * Allow reading and writing the battery level value
+* Restart advertising after central disconnected (allow new central connection)
 
 ### Improvements
 

@@ -28,7 +28,7 @@ BATTERY_SERVICE_APPEARANCE = const(3264)  # Generic Personal Mobility Device
 def _create_battery_service():
     battery_service_uuid = UUID(0x180F)
     battery_level_characteristic = (
-    UUID(0x2A19), FLAG_NOTIFY | FLAG_READ,)  # type org.bluetooth.characteristic.battery_level, uint8 0-100
+        UUID(0x2A19), FLAG_NOTIFY | FLAG_READ,)  # type org.bluetooth.characteristic.battery_level, uint8 0-100
     return battery_service_uuid, (battery_level_characteristic,),
 
 
@@ -44,6 +44,7 @@ class BatteryService:
     def __init__(self, ble):
         self.bt = ble
         self.bt.active(True)
+        self.bt.irq(handler=self._irq_handler)
 
     def register_services(self):
         ((self.battery_level_value_handle,),) = self.bt.gatts_register_services(_create_services())
@@ -70,3 +71,8 @@ class BatteryService:
     def read_battery_level_percentage(self):
         value, = unpack('B', self.bt.gatts_read(self.battery_level_value_handle))
         return value
+
+    def _irq_handler(self, event, data):
+        if event == _IRQ_CENTRAL_DISCONNECT:
+            self.bt.gap_advertise(interval_us=500000, adv_data=_create_advertising_payload())
+
