@@ -10,6 +10,8 @@ from ble_advertising import advertising_payload
 from micropython import const
 
 MOCK_BATTERY_LEVEL_HANDLE = 111
+
+_IRQ_CENTRAL_CONNECT = const(1 << 0)
 _IRQ_CENTRAL_DISCONNECT = const(1 << 1)
 
 
@@ -83,7 +85,6 @@ class BLEServiceTestCase(unittest.TestCase):
         service.register_services()
         self.assertEqual(service.read_battery_level_percentage(), 10)
 
-
     def test_should_restart_advertising_after_disconnect(self):
         disconnect_data = (123, 'A_type', 'address')
         service = BatteryService(self.mockBLE)
@@ -94,6 +95,15 @@ class BLEServiceTestCase(unittest.TestCase):
                                                                         'adv_data': _create_expected_advertising_payload()},
                                                       times=1))
 
+    def test_should_restart_advertising_after_connect(self):
+        connect_data = (124, 'A_type', 'address')
+        service = BatteryService(self.mockBLE)
+        # testing 'private' method !!
+        self.assertTrue(self.mockBLE.has_been_called(method='irq', times=1))
+        service._irq_handler(_IRQ_CENTRAL_CONNECT, connect_data)
+        self.assertTrue(self.mockBLE.has_been_called_with('gap_advertise', {'interval_us': 500000,
+                                                                            'adv_data': _create_expected_advertising_payload()},
+                                                          times=1))
 
 if __name__ == '__main__':
     unittest.main()

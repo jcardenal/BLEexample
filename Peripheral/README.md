@@ -25,11 +25,12 @@ following a phased approach:
 * Allow reading and writing the battery level value
 * Restart advertising after central disconnected (allow new central connection)
 
-### Improvements
+### Improvements (some of them already implemented)
 
-* Add descriptors for the characteristics
+* Allow multiple connections from centrals 
 * Read the value for the battery level from an ADC connected to a potentiometer
 * Notify the central(s) when the battery level changes, asynchronously
+* Add descriptors for the characteristics
 
 
 # Interesting pointers

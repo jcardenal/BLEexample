@@ -73,3 +73,5 @@ class BatteryService:
     def _irq_handler(self, event, data):
         if event == _IRQ_CENTRAL_DISCONNECT:
             self.start()
+        elif event == _IRQ_CENTRAL_CONNECT:
+            self.start()
