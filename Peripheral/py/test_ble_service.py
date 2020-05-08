@@ -5,7 +5,8 @@
 import unittest
 from mock.mock import create_mock, Mock
 from bluetooth import BLE, UUID, FLAG_READ, FLAG_NOTIFY
-from ble_service import BatteryService
+from ble_service import BatteryService, BATTERY_SERVICE_APPEARANCE
+from ble_advertising import advertising_payload
 
 
 def _create_expected_services():
@@ -14,6 +15,8 @@ def _create_expected_services():
     battery_service = (battery_service_uuid, (battery_level_characteristic,),)
     return (battery_service,)
 
+def _create_expected_advertising_payload():
+    return advertising_payload(name='micropython-esp32', services=[UUID(0x180F)], appearance=BATTERY_SERVICE_APPEARANCE)
 
 class BLEServiceTestCase(unittest.TestCase):
     def setUp(self):
@@ -39,7 +42,7 @@ class BLEServiceTestCase(unittest.TestCase):
         service = BatteryService(self.mockBLE)
         service.register_services()
         service.start()
-        self.assertTrue(self.mockBLE.has_been_called_with('gap_advertise', (625,), times=1))
+        self.assertTrue(self.mockBLE.has_been_called_with('gap_advertise', {'interval_us': 500000, 'adv_data': _create_expected_advertising_payload()}, times=1))
 
     def test_should_stop_advertising(self):
         service = BatteryService(self.mockBLE)

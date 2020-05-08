@@ -3,6 +3,8 @@
 """
 from bluetooth import UUID, FLAG_READ, FLAG_NOTIFY
 from micropython import const
+from ble_advertising import advertising_payload
+
 
 _IRQ_CENTRAL_CONNECT = const(1 << 0)
 _IRQ_CENTRAL_DISCONNECT = const(1 << 1)
@@ -20,6 +22,8 @@ _IRQ_GATTC_WRITE_STATUS = const(1 << 12)
 _IRQ_GATTC_NOTIFY = const(1 << 13)
 _IRQ_GATTC_INDICATE = const(1 << 14)
 
+BATTERY_SERVICE_APPEARANCE = const(3264)  # Generic Personal Mobility Device
+
 
 def _create_battery_service():
     battery_service_uuid = UUID(0x180F)
@@ -30,6 +34,8 @@ def _create_battery_service():
 def _create_services():
     return _create_battery_service(),
 
+def _create_advertising_payload():
+    return advertising_payload(name='micropython-esp32', services=[UUID(0x180F)], appearance=BATTERY_SERVICE_APPEARANCE)
 
 class BatteryService:
     def __init__(self, ble):
@@ -38,10 +44,10 @@ class BatteryService:
 
     def register_services(self):
         ((battery_level_value_handle,),) = self.bt.gatts_register_services(_create_services())
-        self.bt.gatts_write(battery_level_value_handle, 50)
+        self.bt.gatts_write(battery_level_value_handle, "50")
 
     def start(self, event_handler=None):
-        self.bt.gap_advertise(625)
+        self.bt.gap_advertise(interval_us=500000, adv_data=_create_advertising_payload())
         if event_handler is not None:
             self.bt.irq(event_handler)
 

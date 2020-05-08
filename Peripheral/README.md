@@ -20,7 +20,7 @@ following a phased approach:
 ### Initial implementation
 
 * Register a service for [Battery Service](https://www.bluetooth.org/docman/handlers/downloaddoc.ashx?doc_id=245138)
-* Advertise the service
+* Advertise the service, including advertising payload
 * Allow a central to connect to the peripheral and read the value
 
 ### Improvements
