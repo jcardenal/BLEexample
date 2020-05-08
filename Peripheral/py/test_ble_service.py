@@ -75,6 +75,11 @@ class BLEServiceTestCase(unittest.TestCase):
         service.set_battery_level_percentage(101)
         self.assertTrue(self.mockBLE.has_been_called_with('gatts_write', (MOCK_BATTERY_LEVEL_HANDLE, b'\x64'), times=2))
 
+    def test_should_read_battery_level_percentage(self):
+        self.mockBLE.when('gatts_read', (MOCK_BATTERY_LEVEL_HANDLE, ), return_value=b'\x0A')
+        service = BatteryService(self.mockBLE)
+        service.register_services()
+        self.assertEqual(service.read_battery_level_percentage(), 10)
 
 
 def test_should_set_handler_for_events(self):

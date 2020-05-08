@@ -4,8 +4,7 @@
 from bluetooth import UUID, FLAG_READ, FLAG_NOTIFY
 from micropython import const
 from ble_advertising import advertising_payload
-from struct import pack
-
+from struct import pack, unpack
 
 _IRQ_CENTRAL_CONNECT = const(1 << 0)
 _IRQ_CENTRAL_DISCONNECT = const(1 << 1)
@@ -28,15 +27,18 @@ BATTERY_SERVICE_APPEARANCE = const(3264)  # Generic Personal Mobility Device
 
 def _create_battery_service():
     battery_service_uuid = UUID(0x180F)
-    battery_level_characteristic = (UUID(0x2A19), FLAG_NOTIFY | FLAG_READ,) # type org.bluetooth.characteristic.battery_level, uint8 0-100
+    battery_level_characteristic = (
+    UUID(0x2A19), FLAG_NOTIFY | FLAG_READ,)  # type org.bluetooth.characteristic.battery_level, uint8 0-100
     return battery_service_uuid, (battery_level_characteristic,),
 
 
 def _create_services():
     return _create_battery_service(),
 
+
 def _create_advertising_payload():
     return advertising_payload(name='micropython-esp32', services=[UUID(0x180F)], appearance=BATTERY_SERVICE_APPEARANCE)
+
 
 class BatteryService:
     def __init__(self, ble):
@@ -64,3 +66,7 @@ class BatteryService:
             value = percentage
         packed_value = pack('B', value)
         self.bt.gatts_write(self.battery_level_value_handle, packed_value)
+
+    def read_battery_level_percentage(self):
+        packed_value = self.bt.gatts_read(self.battery_level_value_handle)
+        return unpack('B', packed_value)[0]
