@@ -66,6 +66,8 @@ class BatteryService:
             value = percentage
         packed_value = pack('B', value)
         self.bt.gatts_write(self.battery_level_value_handle, packed_value)
+        for central in self._connected_centrals:
+            self.bt.gatts_notify(central, self.battery_level_value_handle, packed_value)
 
     def read_battery_level_percentage(self):
         value, = unpack('B', self.bt.gatts_read(self.battery_level_value_handle))

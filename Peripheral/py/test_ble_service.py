@@ -123,5 +123,19 @@ class BLEServiceTestCase(unittest.TestCase):
         service._irq_handler(_IRQ_CENTRAL_DISCONNECT, data)
         self.assertEqual(service.connected_centrals(), 0)
 
+    def test_should_notify_connect_centrals_on_battery_level_change(self):
+        self.mockBLE.when('gatts_read', (MOCK_BATTERY_LEVEL_HANDLE, ), return_value=b'\x0A')
+        connect_data = (124, 'A_type', 'address')
+        service = BatteryService(self.mockBLE)
+        service.register_services()
+        service.start()
+        self.assertFalse(self.mockBLE.has_been_called(method='gatts_notify'))
+        # triggering 'private' method !!
+        service._irq_handler(_IRQ_CENTRAL_CONNECT, connect_data)
+        service.set_battery_level_percentage(23)
+        self.assertTrue(self.mockBLE.has_been_called(method='gatts_notify', times=1))
+
+
+
 if __name__ == '__main__':
     unittest.main()
