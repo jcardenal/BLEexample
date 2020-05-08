@@ -11,6 +11,19 @@ See [Getting started with MicroPython on the ESP32](https://docs.micropython.org
 * [rshell](https://github.com/dhylands/rshell) to access the _ESP32_ and copy the required files
 * [ubluetooth](https://docs.micropython.org/en/latest/library/ubluetooth.html) micropython module
 * [mock](#Mock) see below
+* [BLE Scanner](https://play.google.com/store/apps/details?id=com.macdom.ble.blescanner), android app to play with BLE
+
+# ESP32 board
+SP-Cow ESP32 modulo WiFi Placa de Desarrollo, ESP-WROOM-32 ESP-32 ESP-32S 2.4GHz WiFi + Bluetooth Modo Dual Módulo de Antena con Ultra Low Power (1 Pack)
+
+You can find a board like this [here](https://www.amazon.es/gp/product/B07XH45MWW/ref=ppx_yo_dt_b_asin_title_o07_s00)
+
+![This is the board](ESP32.jpg)
+
+Additional information regarding ESP32:
+
+* [micropython quick reference for the ESP32](https://docs.micropython.org/en/latest/esp32/quickref.html)
+* [Espressif](https://www.espressif.com/en/support/documents/technical-documents?keys=&field_type_tid%5B%5D=54)
 
 # Implemented behaviour
 
@@ -29,6 +42,7 @@ following a phased approach:
 
 * Allow multiple connections from centrals
 * Notify the central(s) when the battery level changes, asynchronously 
+* Allow feedback on central connections using the on-board blue led (Pin 2)
 * Read the value for the battery level from an ADC connected to a potentiometer
 * Add descriptors for the characteristics
 
