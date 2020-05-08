@@ -36,6 +36,8 @@ following a phased approach:
  - [ESP32 Machine emulator](https://github.com/tflander/esp32-machine-emulator#esp32-machine-emulator), not very mature project yet, but promising 
  - [micropython unix porting](https://github.com/micropython/micropython#the-unix-version), also available on _Ubuntu_ as `snap install micropython`; _ubluetooth_ module not available
  - [uPyM5BLE](https://github.com/lemariva/uPyM5BLE), a more complete project (worth taking a look)
+ - [GAP appearance](https://www.bluetooth.com/xml-viewer/?src=https://www.bluetooth.com/wp-content/uploads/Sitecore-Media-Library/Gatt/Xml/Characteristics/org.bluetooth.characteristic.gap.appearance.xml), generic codes for peripheral appearance
+
 # Mock
 
 As part of this project, a simple module to create mocks and ease TDD-ing the development of the main module has been developed
