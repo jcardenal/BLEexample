@@ -22,6 +22,7 @@ following a phased approach:
 * Register a service for [Battery Service](https://www.bluetooth.org/docman/handlers/downloaddoc.ashx?doc_id=245138)
 * Advertise the service, including advertising payload
 * Allow a central to connect to the peripheral and read the value
+* Allow reading and writing the battery level value
 
 ### Improvements
 
