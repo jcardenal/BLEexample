@@ -50,10 +50,8 @@ class BatteryService:
         ((self.battery_level_value_handle,),) = self.bt.gatts_register_services(_create_services())
         self.bt.gatts_write(self.battery_level_value_handle, b'\x32')
 
-    def start(self, event_handler=None):
+    def start(self):
         self.bt.gap_advertise(interval_us=500000, adv_data=_create_advertising_payload())
-        if event_handler is not None:
-            self.bt.irq(event_handler)
 
     def stop(self):
         self.bt.gap_advertise(None)
@@ -74,5 +72,4 @@ class BatteryService:
 
     def _irq_handler(self, event, data):
         if event == _IRQ_CENTRAL_DISCONNECT:
-            self.bt.gap_advertise(interval_us=500000, adv_data=_create_advertising_payload())
-
+            self.start()
