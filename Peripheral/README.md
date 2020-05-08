@@ -36,14 +36,19 @@ following a phased approach:
 # Interesting pointers
 
 * Regarding TDD & micropython:
- - [ESP32 Machine emulator](https://github.com/tflander/esp32-machine-emulator#esp32-machine-emulator), not very mature project yet, but promising 
- - [micropython unix porting](https://github.com/micropython/micropython#the-unix-version), also available on _Ubuntu_ as `snap install micropython`; _ubluetooth_ module not available
+  - [ESP32 Machine emulator](https://github.com/tflander/esp32-machine-emulator#esp32-machine-emulator), not very mature project yet, but promising 
+  - [micropython unix porting](https://github.com/micropython/micropython#the-unix-version), also available on _Ubuntu_ as `snap install micropython`; _ubluetooth_ module not available
 
 * Regarding BLE details and codes:
- - [micropython examples repository: bluetooth](https://github.com/micropython/micropython/tree/master/examples/bluetooth)
- - [GAP appearance](https://www.bluetooth.com/xml-viewer/?src=https://www.bluetooth.com/wp-content/uploads/Sitecore-Media-Library/Gatt/Xml/Characteristics/org.bluetooth.characteristic.gap.appearance.xml), generic codes for peripheral appearance
- - [uPyM5BLE](https://github.com/lemariva/uPyM5BLE), a more complete project (worth taking a look)
+  - [ubluetooth package](https://docs.micropython.org/en/latest/library/ubluetooth.html?highlight=ubluetooth#module-ubluetooth)
+  - [micropython examples repository: bluetooth](https://github.com/micropython/micropython/tree/master/examples/bluetooth)
+  - [GAP appearance](https://www.bluetooth.com/xml-viewer/?src=https://www.bluetooth.com/wp-content/uploads/Sitecore-Media-Library/Gatt/Xml/Characteristics/org.bluetooth.characteristic.gap.appearance.xml), generic codes for peripheral appearance
+  - [uPyM5BLE](https://github.com/lemariva/uPyM5BLE), a more complete project (worth taking a look)
  
+* Regarding ADC details in ESP32:
+  - [Quick Reference for the ESP32: ADC](https://docs.micropython.org/en/latest/esp32/quickref.html#adc-analog-to-digital-conversion)
+  - [micropython machine.ADC](https://docs.micropython.org/en/latest/library/machine.ADC.html)
+
 # Mock
 
 As part of this project, a simple module to create mocks and ease TDD-ing the development of the main module has been developed
