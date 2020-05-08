@@ -4,6 +4,7 @@
 from bluetooth import UUID, FLAG_READ, FLAG_NOTIFY
 from micropython import const
 from ble_advertising import advertising_payload
+from struct import pack
 
 
 _IRQ_CENTRAL_CONNECT = const(1 << 0)
@@ -27,7 +28,7 @@ BATTERY_SERVICE_APPEARANCE = const(3264)  # Generic Personal Mobility Device
 
 def _create_battery_service():
     battery_service_uuid = UUID(0x180F)
-    battery_level_characteristic = (UUID(0x2A19), FLAG_NOTIFY | FLAG_READ,)
+    battery_level_characteristic = (UUID(0x2A19), FLAG_NOTIFY | FLAG_READ,) # type org.bluetooth.characteristic.battery_level, uint8 0-100
     return battery_service_uuid, (battery_level_characteristic,),
 
 
@@ -43,8 +44,8 @@ class BatteryService:
         self.bt.active(True)
 
     def register_services(self):
-        ((battery_level_value_handle,),) = self.bt.gatts_register_services(_create_services())
-        self.bt.gatts_write(battery_level_value_handle, "50")
+        ((self.battery_level_value_handle,),) = self.bt.gatts_register_services(_create_services())
+        self.bt.gatts_write(self.battery_level_value_handle, b'\x32')
 
     def start(self, event_handler=None):
         self.bt.gap_advertise(interval_us=500000, adv_data=_create_advertising_payload())
@@ -53,3 +54,13 @@ class BatteryService:
 
     def stop(self):
         self.bt.gap_advertise(None)
+
+    def set_battery_level_percentage(self, percentage):
+        if percentage < 0:
+            value = 0
+        elif percentage > 100:
+            value = 100
+        else:
+            value = percentage
+        packed_value = pack('B', value)
+        self.bt.gatts_write(self.battery_level_value_handle, packed_value)
