@@ -105,5 +105,23 @@ class BLEServiceTestCase(unittest.TestCase):
                                                                             'adv_data': _create_expected_advertising_payload()},
                                                           times=1))
 
+    def test_should_add_connection_handle_on_central_connected(self):
+        connect_data = (124, 'A_type', 'address')
+        service = BatteryService(self.mockBLE)
+        self.assertEqual(service.connected_centrals(), 0)
+        # triggering 'private' method !!
+        service._irq_handler(_IRQ_CENTRAL_CONNECT, connect_data)
+        self.assertEqual(service.connected_centrals(), 1)
+
+    def test_should_remove_connection_handle_on_central_disconnected(self):
+        data = (124, 'A_type', 'address')
+        service = BatteryService(self.mockBLE)
+        self.assertEqual(service.connected_centrals(), 0)
+        # triggering 'private' method !!
+        service._irq_handler(_IRQ_CENTRAL_CONNECT, data)
+        self.assertEqual(service.connected_centrals(), 1)
+        service._irq_handler(_IRQ_CENTRAL_DISCONNECT, data)
+        self.assertEqual(service.connected_centrals(), 0)
+
 if __name__ == '__main__':
     unittest.main()

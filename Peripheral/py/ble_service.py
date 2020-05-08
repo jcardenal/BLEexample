@@ -45,6 +45,7 @@ class BatteryService:
         self.bt = ble
         self.bt.active(True)
         self.bt.irq(handler=self._irq_handler)
+        self._connected_centrals = set()
 
     def register_services(self):
         ((self.battery_level_value_handle,),) = self.bt.gatts_register_services(_create_services())
@@ -70,8 +71,16 @@ class BatteryService:
         value, = unpack('B', self.bt.gatts_read(self.battery_level_value_handle))
         return value
 
+    def connected_centrals(self):
+        return len(self._connected_centrals)
+
     def _irq_handler(self, event, data):
         if event == _IRQ_CENTRAL_DISCONNECT:
+            conn_handle, _, _, = data
+            if conn_handle in self._connected_centrals:
+                self._connected_centrals.remove(conn_handle)
             self.start()
         elif event == _IRQ_CENTRAL_CONNECT:
+            conn_handle, _, _, = data
+            self._connected_centrals.add(conn_handle)
             self.start()
