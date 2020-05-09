@@ -2,9 +2,6 @@
 
 Simple implementation of a BLE GATT server providing a [Battery Service](https://www.bluetooth.org/docman/handlers/downloaddoc.ashx?doc_id=245138)
 
-# Flashing ESP32
-
-See [Getting started with MicroPython on the ESP32](https://docs.micropython.org/en/latest/esp32/tutorial/intro.html) tutorial
 
 # Development tools
 
@@ -13,7 +10,7 @@ See [Getting started with MicroPython on the ESP32](https://docs.micropython.org
 * [mock](#Mock) see below
 * [BLE Scanner](https://play.google.com/store/apps/details?id=com.macdom.ble.blescanner), android app to play with BLE
 
-# ESP32 board
+## ESP32 board
 SP-Cow ESP32 modulo WiFi Placa de Desarrollo, ESP-WROOM-32 ESP-32 ESP-32S 2.4GHz WiFi + Bluetooth Modo Dual Módulo de Antena con Ultra Low Power (1 Pack)
 
 You can find a board like this [here](https://www.amazon.es/gp/product/B07XH45MWW/ref=ppx_yo_dt_b_asin_title_o07_s00)
@@ -25,9 +22,13 @@ Additional information regarding ESP32:
 * [micropython quick reference for the ESP32](https://docs.micropython.org/en/latest/esp32/quickref.html)
 * [Espressif](https://www.espressif.com/en/support/documents/technical-documents?keys=&field_type_tid%5B%5D=54)
 
+### Flashing micropython to ESP32
+
+See [Getting started with MicroPython on the ESP32](https://docs.micropython.org/en/latest/esp32/tutorial/intro.html) tutorial
+
 # Implemented behaviour
 
-What does this BLE test implementation? Well, not much. In addition, the behaviour was implemented
+What does this BLE test implementation do? Well, not much. In addition, the behaviour was implemented
 following a phased approach:
 
 ### Initial implementation
