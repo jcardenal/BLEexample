@@ -39,7 +39,7 @@ following a phased approach:
 * [x] Allow reading and writing the battery level value
 * [x] Restart advertising after central disconnected (allow new central connection)
 
-## Improvements (some of them already implemented)
+## Improvements
 
 * [x] Allow multiple connections from centrals
 * [x] Notify the central(s) when the battery level changes, asynchronously 
