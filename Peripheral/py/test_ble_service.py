@@ -79,6 +79,18 @@ class BLEServiceTestCase(unittest.TestCase):
         service.set_battery_level_percentage(101)
         self.assertTrue(self.mockBLE.has_been_called_with('gatts_write', (MOCK_BATTERY_LEVEL_HANDLE, b'\x64'), times=2))
 
+    def test_should_round_values_to_nearest_integer(self):
+        service = BatteryService(self.mockBLE)
+        service.register_services()
+        service.set_battery_level_percentage(0.21)
+        self.assertTrue(self.mockBLE.has_been_called_with('gatts_write', (MOCK_BATTERY_LEVEL_HANDLE, b'\x00'), times=1))
+        service.set_battery_level_percentage(0.87)
+        self.assertTrue(self.mockBLE.has_been_called_with('gatts_write', (MOCK_BATTERY_LEVEL_HANDLE, b'\x01'), times=1))
+        service.set_battery_level_percentage(99.8)
+        self.assertTrue(self.mockBLE.has_been_called_with('gatts_write', (MOCK_BATTERY_LEVEL_HANDLE, b'\x64'), times=1))
+        service.set_battery_level_percentage(99.1)
+        self.assertTrue(self.mockBLE.has_been_called_with('gatts_write', (MOCK_BATTERY_LEVEL_HANDLE, b'\x63'), times=1))
+
     def test_should_read_battery_level_percentage(self):
         self.mockBLE.when('gatts_read', (MOCK_BATTERY_LEVEL_HANDLE, ), return_value=b'\x0A')
         service = BatteryService(self.mockBLE)

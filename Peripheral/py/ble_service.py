@@ -57,7 +57,8 @@ class BatteryService:
     def stop(self):
         self.bt.gap_advertise(None)
 
-    def set_battery_level_percentage(self, percentage):
+    def set_battery_level_percentage(self, raw_percentage):
+        percentage = int(round(raw_percentage))
         if percentage < 0:
             value = 0
         elif percentage > 100:
