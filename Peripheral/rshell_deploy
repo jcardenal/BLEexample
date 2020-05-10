@@ -1,0 +1,6 @@
+echo "Deploying files..."
+cd py
+cp main.py /pyboard/
+cp ble_service.py /pyboard/
+cp ble_advertising.py /pyboard/
+echo "Files deployed!!"

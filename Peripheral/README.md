@@ -31,7 +31,7 @@ See [Getting started with MicroPython on the ESP32](https://docs.micropython.org
 What does this BLE test implementation do? Well, not much. In addition, the behaviour was implemented
 following a phased approach:
 
-### Initial implementation
+## Initial implementation
 
 * Register a service for [Battery Service](https://www.bluetooth.org/docman/handlers/downloaddoc.ashx?doc_id=245138)
 * Advertise the service, including advertising payload
@@ -39,13 +39,22 @@ following a phased approach:
 * Allow reading and writing the battery level value
 * Restart advertising after central disconnected (allow new central connection)
 
-### Improvements (some of them already implemented)
+## Improvements (some of them already implemented)
 
 * Allow multiple connections from centrals
 * Notify the central(s) when the battery level changes, asynchronously 
 * Allow feedback on central connections using the on-board blue led (Pin 2)
 * Read the value for the battery level from an ADC connected to a potentiometer
 * Add descriptors for the characteristics
+
+# Deployment
+With the ESP32 board connected to the USB port, run:
+
+        ./deploy.sh
+        
+This script starts `rshell` in port `/dev/ttyUSB0` and runs the `rshell` commands file
+`rshell_deploy`, which in turn copies all the files in `py` folder **except** those starting
+with `test_`
 
 
 # Interesting pointers
