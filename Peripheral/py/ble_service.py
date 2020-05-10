@@ -58,14 +58,7 @@ class BatteryService:
         self.bt.gap_advertise(None)
 
     def set_battery_level_percentage(self, raw_percentage):
-        percentage = int(round(raw_percentage))
-        if percentage < 0:
-            value = 0
-        elif percentage > 100:
-            value = 100
-        else:
-            value = percentage
-        packed_value = pack('B', value)
+        packed_value = pack('B', self._round_and_limit_percentage(raw_percentage))
         self.bt.gatts_write(self.battery_level_value_handle, packed_value)
         for central in self._connected_centrals:
             self.bt.gatts_notify(central, self.battery_level_value_handle, packed_value)
@@ -76,6 +69,16 @@ class BatteryService:
 
     def connected_centrals(self):
         return len(self._connected_centrals)
+
+    def _round_and_limit_percentage(self, raw_percentage):
+        percentage = int(round(raw_percentage))
+        if percentage < 0:
+            value = 0
+        elif percentage > 100:
+            value = 100
+        else:
+            value = percentage
+        return value
 
     def _irq_handler(self, event, data):
         if event == _IRQ_CENTRAL_DISCONNECT:
