@@ -3,4 +3,5 @@ cd py
 cp main.py /pyboard/
 cp ble_service.py /pyboard/
 cp ble_advertising.py /pyboard/
+cp voltage_reader.py /pyboard/
 echo "Files deployed!!"
