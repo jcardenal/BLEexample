@@ -33,19 +33,19 @@ following a phased approach:
 
 ## Initial implementation
 
-* Register a service for [Battery Service](https://www.bluetooth.org/docman/handlers/downloaddoc.ashx?doc_id=245138)
-* Advertise the service, including advertising payload
-* Allow a central to connect to the peripheral and read the value
-* Allow reading and writing the battery level value
-* Restart advertising after central disconnected (allow new central connection)
+* [x] Register a service for [Battery Service](https://www.bluetooth.org/docman/handlers/downloaddoc.ashx?doc_id=245138)
+* [x] Advertise the service, including advertising payload
+* [x] Allow a central to connect to the peripheral and read the value
+* [x] Allow reading and writing the battery level value
+* [x] Restart advertising after central disconnected (allow new central connection)
 
 ## Improvements (some of them already implemented)
 
-* Allow multiple connections from centrals
-* Notify the central(s) when the battery level changes, asynchronously 
-* Allow feedback on central connections using the on-board blue led (Pin 2)
-* Read the value for the battery level from an ADC connected to a potentiometer
-* Add descriptors for the characteristics
+* [x] Allow multiple connections from centrals
+* [x] Notify the central(s) when the battery level changes, asynchronously 
+* [x] Read the value for the battery level from an ADC connected to a potentiometer
+* [ ] Allow feedback on central connections using the on-board blue led (Pin 2)
+* [ ] Add descriptors for the characteristics
 
 # Deployment
 With the ESP32 board connected to the USB port, run:
