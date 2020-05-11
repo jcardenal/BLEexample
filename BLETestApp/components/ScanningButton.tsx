@@ -19,4 +19,9 @@ const ScanningButton = ({startScan, stopScan}) => {
   return ( <Button raised primary text={buttonText} onPress={handleButtonPressed}/> )
 }
 
+ScanningButton.defaultProps = {
+    startScan: () => {},
+    stopScan: () => {}
+}
+
 export default ScanningButton;
