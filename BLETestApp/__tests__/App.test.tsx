@@ -20,6 +20,8 @@ jest.mock("react-native", () => {
       );
 });
 
+const mockEmitter = {addListener: jest.fn()};
+
 describe("<App />", () => {
 
         it("should render App", () => {
@@ -37,26 +39,26 @@ describe("<App />", () => {
         });
 
         it("should register BLE listener for peripheral discovery", async () => {
-            render( <App />);
-            await expect(bleManagerEmitter.addListener)
+            render( <App emitter={mockEmitter} />);
+            await expect(mockEmitter.addListener)
                     .toHaveBeenCalledWith('BleManagerDiscoverPeripheral', expect.any(Function));
         });
 
         it("should register BLE listener for end of scan", async () => {
-            render( <App />);
-            await expect(bleManagerEmitter.addListener)
+            render( <App emitter={mockEmitter} />);
+            await expect(mockEmitter.addListener)
                     .toHaveBeenCalledWith('BleManagerStopScan', expect.any(Function));
         });
 
         it("should register BLE listener for peripheral connected", async () => {
-            render( <App />);
-            await expect(bleManagerEmitter.addListener)
+            render( <App emitter={mockEmitter} />);
+            await expect(mockEmitter.addListener)
                     .toHaveBeenCalledWith('BleManagerConnectPeripheral', expect.any(Function));
         });
 
         it("should register BLE listener for peripheral disconnected", async () => {
-            render( <App />);
-            await expect(bleManagerEmitter.addListener)
+            render( <App emitter={mockEmitter} />);
+            await expect(mockEmitter.addListener)
                     .toHaveBeenCalledWith('BleManagerDisconnectPeripheral', expect.any(Function));
         });
 

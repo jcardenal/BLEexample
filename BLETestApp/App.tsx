@@ -5,7 +5,7 @@ import MainView from './components/MainView';
 import BleManager from 'react-native-ble-manager';
 
 const BleManagerModule = NativeModules.BleManager;
-export const bleManagerEmitter = new NativeEventEmitter(BleManagerModule);
+const bleManagerEmitter = new NativeEventEmitter(BleManagerModule);
 
 const uiTheme = {
   palette: {
@@ -13,17 +13,17 @@ const uiTheme = {
   },
 };
 
-const App = () => {
+const App = ({emitter}) => {
 
   useEffect(() => {BleManager.start()
                         .then(() => {
                              // Success code
                              console.log('BLE support module initialized');
                            });
-                   bleManagerEmitter.addListener('BleManagerDiscoverPeripheral', () => {});
-                   bleManagerEmitter.addListener('BleManagerStopScan', () => {});
-                   bleManagerEmitter.addListener('BleManagerConnectPeripheral', () => {});
-                   bleManagerEmitter.addListener('BleManagerDisconnectPeripheral', () => {});
+                   emitter.addListener('BleManagerDiscoverPeripheral', () => {});
+                   emitter.addListener('BleManagerStopScan', () => {});
+                   emitter.addListener('BleManagerConnectPeripheral', () => {});
+                   emitter.addListener('BleManagerDisconnectPeripheral', () => {});
                    }, []);
 
 
@@ -34,5 +34,8 @@ const App = () => {
   );
 }
 
+App.defaultProps = {
+    emitter: bleManagerEmitter,
+}
 
 export default App;
