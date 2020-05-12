@@ -22,6 +22,8 @@ const App = () => {
                            });
                    bleManagerEmitter.addListener('BleManagerDiscoverPeripheral', () => {});
                    bleManagerEmitter.addListener('BleManagerStopScan', () => {});
+                   bleManagerEmitter.addListener('BleManagerConnectPeripheral', () => {});
+                   bleManagerEmitter.addListener('BleManagerDisconnectPeripheral', () => {});
                    }, []);
 
 
