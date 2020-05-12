@@ -1,6 +1,6 @@
 import React from 'react';
 import {render} from 'react-native-testing-library';
-import App from '../App';
+import App, {bleManagerEmitter} from '../App';
 import * as BleManager from 'react-native-ble-manager';
 import * as ReactNative from 'react-native';
 
@@ -14,7 +14,7 @@ jest.mock("react-native", () => {
             ...ReactNative.NativeModules,
             BleManager: jest.fn()
           },
-          NativeEventEmitter: jest.fn(),
+          NativeEventEmitter: jest.fn(() => ({addListener: jest.fn() }) ),
         },
         ReactNative
       );
@@ -34,5 +34,11 @@ describe("<App />", () => {
         it("should create 'NativeEventEmitter'", async () => {
             render( <App />);
             await expect(ReactNative.NativeEventEmitter).toHaveBeenCalled();
-         });
+        });
+
+        it("should register BLE listener for peripheral discovery", async () => {
+            render( <App />);
+            await expect(bleManagerEmitter.addListener)
+                    .toHaveBeenCalledWith('BleManagerDiscoverPeripheral', expect.any(Function));
+        });
 })

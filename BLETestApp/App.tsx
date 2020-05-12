@@ -5,7 +5,7 @@ import MainView from './components/MainView';
 import BleManager from 'react-native-ble-manager';
 
 const BleManagerModule = NativeModules.BleManager;
-const bleManagerEmitter = new NativeEventEmitter(BleManagerModule);
+export const bleManagerEmitter = new NativeEventEmitter(BleManagerModule);
 
 const uiTheme = {
   palette: {
@@ -21,6 +21,9 @@ const App = () => {
                              console.log('BLE support module initialized');
                            });
                    }, []);
+
+  console.log("bleManagerEmitter", bleManagerEmitter);
+  bleManagerEmitter.addListener('BleManagerDiscoverPeripheral', () => {});
 
   return (
    <ThemeContext.Provider value={getTheme(uiTheme)}>
