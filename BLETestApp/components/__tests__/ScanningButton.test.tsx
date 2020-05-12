@@ -24,6 +24,6 @@ describe("<ScanningButton />", () => {
         await expect(BleManager.scan).toHaveBeenCalledWith([], SCAN_PERIOD_IN_SECONDS, true);
         await waitForElement(() => getByText('STOP SCAN'));
         fireEvent.press(getByText("STOP SCAN"));
-        await expect(BleManager.stopScan).toHaveBeenCalledWith({});
+        await expect(BleManager.stopScan).toHaveBeenCalledWith();
     });
 })
