@@ -41,4 +41,10 @@ describe("<App />", () => {
             await expect(bleManagerEmitter.addListener)
                     .toHaveBeenCalledWith('BleManagerDiscoverPeripheral', expect.any(Function));
         });
+
+        it("should register BLE listener for end of scan", async () => {
+            render( <App />);
+            await expect(bleManagerEmitter.addListener)
+                    .toHaveBeenCalledWith('BleManagerStopScan', expect.any(Function));
+        });
 })

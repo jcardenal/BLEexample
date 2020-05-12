@@ -20,10 +20,10 @@ const App = () => {
                              // Success code
                              console.log('BLE support module initialized');
                            });
+                   bleManagerEmitter.addListener('BleManagerDiscoverPeripheral', () => {});
+                   bleManagerEmitter.addListener('BleManagerStopScan', () => {});
                    }, []);
 
-  console.log("bleManagerEmitter", bleManagerEmitter);
-  bleManagerEmitter.addListener('BleManagerDiscoverPeripheral', () => {});
 
   return (
    <ThemeContext.Provider value={getTheme(uiTheme)}>
