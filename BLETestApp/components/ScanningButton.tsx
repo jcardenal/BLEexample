@@ -11,7 +11,11 @@ const ScanningButton = () => {
   const emitter = useContext(EmitterContext)
 
   useEffect(() => {
-        emitter.addListener('BleManagerStopScan', () => {});
+        emitter.addListener('BleManagerStopScan', () => {
+                setScanning(false);
+                setButtonText("Start Scan");
+             }
+        );
   }, []);
 
   const handleButtonPressed = () => {

@@ -29,6 +29,7 @@ describe("<ScanningButton />", () => {
     let container;
 
     beforeEach(() => {
+        emitterMock.addListener.mockClear();
         container = render(
             <EmitterContext.Provider value={emitterMock}>
                 <ScanningButton />
@@ -58,4 +59,17 @@ describe("<ScanningButton />", () => {
         fireEvent.press(container.getByText("STOP SCAN"));
         await expect(BleManager.stopScan).toHaveBeenCalledWith();
     });
+
+    it("should display 'START SCAN' after scan period finished", async () => {
+        fireEvent.press(container.getByText("START SCAN"));
+        await waitForElement(() => container.getByText('STOP SCAN'));
+        callLastRegisteredScanEndListener(emitterMock.addListener);
+        await waitForElement(() => container.getByText('START SCAN'));
+    })
 })
+
+const callLastRegisteredScanEndListener = mock => {
+        const lastCall = mock.mock.calls.length -1;
+        const stopScanListener = mock.mock.calls[lastCall][1];
+        stopScanListener();
+};
