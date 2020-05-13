@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, createContext} from 'react';
 import {NativeEventEmitter, NativeModules} from 'react-native';
 import { ThemeContext, getTheme, COLOR } from 'react-native-material-ui';
 import MainView from './components/MainView';
@@ -6,6 +6,8 @@ import BleManager from 'react-native-ble-manager';
 
 const BleManagerModule = NativeModules.BleManager;
 const bleManagerEmitter = new NativeEventEmitter(BleManagerModule);
+
+export const EmitterContext = createContext(bleManagerEmitter)
 
 const uiTheme = {
   palette: {
@@ -28,9 +30,11 @@ const App = ({emitter}) => {
 
 
   return (
-   <ThemeContext.Provider value={getTheme(uiTheme)}>
-      <MainView />
-   </ThemeContext.Provider>
+      <EmitterContext.Provider value={emitter}>
+           <ThemeContext.Provider value={getTheme(uiTheme)}>
+              <MainView />
+           </ThemeContext.Provider>
+       </EmitterContext.Provider>
   );
 }
 
