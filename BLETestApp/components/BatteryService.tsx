@@ -13,6 +13,7 @@ const BatteryService = ({sname, onRead}) => {
 
     useEffect(() => {
              emitter.addListener('BleManagerConnectPeripheral', () => {});
+             emitter.addListener('BleManagerDisconnectPeripheral', () => {});
     }, []);
 
     const handleConnectButton = () => {

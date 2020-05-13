@@ -116,7 +116,7 @@ describe("<BatteryService />", () => {
                     .toHaveBeenCalledWith('BleManagerConnectPeripheral', expect.any(Function));
         });
 
-        xit("should register BLE listener for peripheral disconnected", async () => {
+        it("should register BLE listener for peripheral disconnected", async () => {
             await expect(mockEmitter.addListener)
                     .toHaveBeenCalledWith('BleManagerDisconnectPeripheral', expect.any(Function));
         });
