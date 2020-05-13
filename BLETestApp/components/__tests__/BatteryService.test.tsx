@@ -6,66 +6,68 @@ import BatteryService from '../BatteryService';
 describe("<BatteryService />", () => {
 
     describe("structural tests", () => {
+        let container;
+        beforeEach(() => {
+          container = render(<BatteryService />)
+        });
+
         it("should render component", () => {
-            render(<BatteryService />)
+            expect(container).toBeTruthy();
         })
 
         it("should render CONNECT button", () => {
-            const {getByText} = render(<BatteryService />)
-            expect(getByText("CONNECT")).toBeTruthy()
+            expect(container.getByText("CONNECT")).toBeTruthy()
         })
 
         it("should render 'n/a' service name", () => {
-            const {getByText} = render(<BatteryService />)
-            expect(getByText("N/A")).toBeTruthy()
+            expect(container.getByText("N/A")).toBeTruthy()
         })
 
         it("should render 'Battery: unknown' message", () => {
-            const {getByText} = render(<BatteryService />)
-            expect(getByText("Battery: unknown")).toBeTruthy()
+            expect(container.getByText("Battery: unknown")).toBeTruthy()
         })
 
         it("should render 'READ' button disabled", () => {
-            const {getByText} = render(<BatteryService />)
-            expect(getByText("READ")).toBeTruthy()
-            expect(getByText("READ")).toBeDisabled(true)
+            expect(container.getByText("READ")).toBeTruthy()
+            expect(container.getByText("READ")).toBeDisabled(true)
         })
     })
 
     describe("On Click", () => {
+
+        let container;
+        beforeEach(() => {
+          const mockBatteryReader = jest.fn(() => 93)
+          container = render(<BatteryService sname="micropython-esp32" onRead={mockBatteryReader} />)
+        });
+
         it("should change 'CONNECT' to 'DISCONNECT' and back", async () => {
-            const {getByText} = render(<BatteryService />)
-            fireEvent.press(getByText("CONNECT"))
-            await waitForElement(() => getByText('DISCONNECT'));
-            fireEvent.press(getByText("DISCONNECT"));
-            await waitForElement(() => getByText('CONNECT'));
+            fireEvent.press(container.getByText("CONNECT"))
+            await waitForElement(() => container.getByText('DISCONNECT'));
+            fireEvent.press(container.getByText("DISCONNECT"));
+            await waitForElement(() => container.getByText('CONNECT'));
         })
 
         it ("should enable 'READ' after 'CONNECT'", () => {
-            const {getByText} = render(<BatteryService />)
-            fireEvent.press(getByText("CONNECT"))
-            expect(getByText("READ")).not.toBeDisabled()
+            fireEvent.press(container.getByText("CONNECT"))
+            expect(container.getByText("READ")).not.toBeDisabled()
         })
 
         it ("should disable 'READ' after 'DISCONNECT'", async () => {
-            const {getByText} = render(<BatteryService />)
-            fireEvent.press(getByText("CONNECT"))
-            await waitForElement(() => getByText('DISCONNECT'));
-            fireEvent.press(getByText("DISCONNECT"));
-            expect(getByText("READ")).toBeDisabled()
+            fireEvent.press(container.getByText("CONNECT"))
+            await waitForElement(() => container.getByText('DISCONNECT'));
+            fireEvent.press(container.getByText("DISCONNECT"));
+            expect(container.getByText("READ")).toBeDisabled()
         })
 
         it ("should render 'micropython-esp32' as service name", () => {
-            const {getByText} = render(<BatteryService sname="micropython-esp32"/>)
-            expect(getByText("micropython-esp32")).toBeTruthy()
+            expect(container.getByText("micropython-esp32")).toBeTruthy()
         })
 
         it("should render 'Battery: 93%' message", async () => {
-            const mockBatteryReader = jest.fn(() => 93)
-            const {getByText} = render(<BatteryService onRead={mockBatteryReader}/>)
-            fireEvent.press(getByText("CONNECT"))
-            fireEvent.press(getByText("READ"))
-            await waitForElement(() => getByText("Battery: 93%"))
+            fireEvent.press(container.getByText("CONNECT"))
+            fireEvent.press(container.getByText("READ"))
+            await waitForElement(() => container.getByText("Battery: 93%"))
         })
     })
 })
