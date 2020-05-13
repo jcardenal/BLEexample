@@ -38,12 +38,6 @@ describe("<App />", () => {
             await expect(ReactNative.NativeEventEmitter).toHaveBeenCalled();
         });
 
-        it("should register BLE listener for peripheral discovery", async () => {
-            render( <App emitter={mockEmitter} />);
-            await expect(mockEmitter.addListener)
-                    .toHaveBeenCalledWith('BleManagerDiscoverPeripheral', expect.any(Function));
-        });
-
         it("should register BLE listener for peripheral connected", async () => {
             render( <App emitter={mockEmitter} />);
             await expect(mockEmitter.addListener)
