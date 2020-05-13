@@ -4,6 +4,20 @@ import MainView from '../MainView';
 import ServicesList from '../ServicesList';
 
 jest.mock('../ServicesList', () => jest.fn( () => null) );
+jest.mock("react-native", () => {
+    const ReactNative = jest.requireActual('react-native');
+
+    return Object.setPrototypeOf(
+        {
+          NativeModules: {
+            ...ReactNative.NativeModules,
+            BleManager: jest.fn()
+          },
+          NativeEventEmitter: jest.fn(() => ({addListener: jest.fn() }) ),
+        },
+        ReactNative
+      );
+});
 
 describe("<MainView />", () => {
     describe("Structural tests", () => {

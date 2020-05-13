@@ -44,12 +44,6 @@ describe("<App />", () => {
                     .toHaveBeenCalledWith('BleManagerDiscoverPeripheral', expect.any(Function));
         });
 
-        it("should register BLE listener for end of scan", async () => {
-            render( <App emitter={mockEmitter} />);
-            await expect(mockEmitter.addListener)
-                    .toHaveBeenCalledWith('BleManagerStopScan', expect.any(Function));
-        });
-
         it("should register BLE listener for peripheral connected", async () => {
             render( <App emitter={mockEmitter} />);
             await expect(mockEmitter.addListener)

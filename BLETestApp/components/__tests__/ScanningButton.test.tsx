@@ -2,21 +2,49 @@ import React from 'react';
 import {fireEvent, render, waitForElement} from 'react-native-testing-library';
 import ScanningButton, {SCAN_PERIOD_IN_SECONDS} from '../ScanningButton';
 import BleManager from 'react-native-ble-manager';
+import {EmitterContext} from '../../App';
+import * as ReactNative from 'react-native';
 
 jest.mock('react-native-ble-manager', () => ({ scan: jest.fn( () => Promise.resolve(['uuid'])),
                                               stopScan: jest.fn( () => Promise.resolve()) }) );
+jest.mock("react-native", () => {
+    const ReactNative = jest.requireActual('react-native');
+
+    return Object.setPrototypeOf(
+        {
+          NativeModules: {
+            ...ReactNative.NativeModules,
+            BleManager: jest.fn()
+          },
+          NativeEventEmitter: jest.fn(() => ({addListener: jest.fn() }) ),
+        },
+        ReactNative
+      );
+});
+
+const emitterMock = { addListener: jest.fn() };
 
 describe("<ScanningButton />", () => {
 
     let container;
 
     beforeEach(() => {
-        container = render( <ScanningButton />);
+        container = render(
+            <EmitterContext.Provider value={emitterMock}>
+                <ScanningButton />
+            </EmitterContext.Provider>
+         );
     });
 
     it("should show 'START SCAN'", async () => {
         expect(container.getByText("START SCAN")).toBeTruthy();
     });
+
+    it("should register listener for scan ended", async () => {
+        await expect(emitterMock.addListener)
+                .toHaveBeenCalledWith('BleManagerStopScan', expect.any(Function));
+    });
+
     it("should change text to 'STOP SCAN' and back", async () => {
         fireEvent.press(container.getByText("START SCAN"));
         await waitForElement(() => container.getByText('STOP SCAN'));
