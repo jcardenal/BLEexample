@@ -1,11 +1,19 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect, useContext} from 'react';
 import {Text} from 'react-native';
 import { Button, Card } from 'react-native-material-ui';
+import {EmitterContext} from '../App';
+
 
 const BatteryService = ({sname, onRead}) => {
     const [connected, setConnected] = useState<Boolean>(false)
     const [percentage, setPercentage] = useState<String>("unknown")
     const getButtonText = () =>  (connected ? "DISCONNECT" : "CONNECT")
+
+    const emitter = useContext(EmitterContext);
+
+    useEffect(() => {
+             emitter.addListener('BleManagerConnectPeripheral', () => {});
+    }, []);
 
     const handleConnectButton = () => {
         connected ? setConnected(false) : setConnected(true)

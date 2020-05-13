@@ -2,13 +2,38 @@ import React from 'react';
 import '@testing-library/jest-native/extend-expect';
 import {fireEvent, render, waitForElement} from 'react-native-testing-library';
 import BatteryService from '../BatteryService';
+import {EmitterContext} from '../../App';
+import * as ReactNative from 'react-native';
+
+
+jest.mock("react-native", () => {
+    const ReactNative = jest.requireActual('react-native');
+
+    return Object.setPrototypeOf(
+        {
+          NativeModules: {
+            ...ReactNative.NativeModules,
+            BleManager: jest.fn()
+          },
+          NativeEventEmitter: jest.fn(() => ({addListener: jest.fn() }) ),
+        },
+        ReactNative
+      );
+});
+
+
+const mockEmitter = {addListener: jest.fn()};
 
 describe("<BatteryService />", () => {
 
     describe("structural tests", () => {
         let container;
         beforeEach(() => {
-          container = render(<BatteryService />)
+          container = render(
+              <EmitterContext.Provider value={mockEmitter}>
+                <BatteryService />
+              </EmitterContext.Provider>
+              );
         });
 
         it("should render component", () => {
@@ -37,8 +62,12 @@ describe("<BatteryService />", () => {
 
         let container;
         beforeEach(() => {
-          const mockBatteryReader = jest.fn(() => 93)
-          container = render(<BatteryService sname="micropython-esp32" onRead={mockBatteryReader} />)
+          const mockBatteryReader = jest.fn(() => 93);
+          container = render(
+                        <EmitterContext.Provider value={mockEmitter}>
+                            <BatteryService sname="micropython-esp32" onRead={mockBatteryReader} />
+                        </EmitterContext.Provider>
+                        );
         });
 
         it("should change 'CONNECT' to 'DISCONNECT' and back", async () => {
@@ -70,4 +99,27 @@ describe("<BatteryService />", () => {
             await waitForElement(() => container.getByText("Battery: 93%"))
         })
     })
+
+    describe("BLE support", () => {
+        let container;
+        beforeEach(() => {
+          const mockBatteryReader = jest.fn(() => 93)
+          container = render(
+                <EmitterContext.Provider value={mockEmitter}>
+                    <BatteryService sname="micropython-esp32" onRead={mockBatteryReader} />
+                </EmitterContext.Provider>
+          )
+        });
+
+        it("should register BLE listener for peripheral connected", async () => {
+            await expect(mockEmitter.addListener)
+                    .toHaveBeenCalledWith('BleManagerConnectPeripheral', expect.any(Function));
+        });
+
+        xit("should register BLE listener for peripheral disconnected", async () => {
+            await expect(mockEmitter.addListener)
+                    .toHaveBeenCalledWith('BleManagerDisconnectPeripheral', expect.any(Function));
+        });
+
+    });
 })
