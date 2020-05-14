@@ -94,7 +94,7 @@ describe("<BatteryService />", () => {
 
         it("should call BLE read when 'READ' button pressed", async () => {
             fireEvent.press(container.getByText("READ"));
-            await expect(BleManager.read).toHaveBeenLastCalledWith(mockPeripheral.id, expect.any(String), expect.any(String) );
+            await expect(BleManager.read).toHaveBeenLastCalledWith(mockPeripheral.id, "180F", "2A19" );
         })
 
         it("should render 'Battery: 93%' message", async () => {
