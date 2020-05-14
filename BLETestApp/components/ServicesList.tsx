@@ -1,6 +1,7 @@
 import React, {useState, useEffect, useContext} from 'react';
 import {ScrollView, Text} from 'react-native'
 import BatteryService from './BatteryService';
+import BleManager from 'react-native-ble-manager';
 import {EmitterContext} from '../App';
 
 const ServicesList = () => {
@@ -12,6 +13,12 @@ const ServicesList = () => {
             if (peripheral) {
                 peripheral = {...peripheral, connected: status};
                 setPeripherals(new Map(peripherals.set(peripheralId, peripheral)));
+                if (status) {
+                    BleManager.retrieveServices(peripheralId)
+                        .then((peripheralInfo) => {
+                            console.log('Peripheral Info: ', peripheralInfo);
+                        });
+                }
             }
     }
 

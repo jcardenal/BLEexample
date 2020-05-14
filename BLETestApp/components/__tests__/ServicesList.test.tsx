@@ -3,6 +3,9 @@ import {act, render, waitForElement} from 'react-native-testing-library';
 import ServicesList from '../ServicesList';
 import BatteryService from '../BatteryService';
 import {EmitterContext} from '../../App';
+import BleManager from 'react-native-ble-manager';
+
+jest.mock('react-native-ble-manager', () => ({ retrieveServices: jest.fn(() => Promise.resolve('peripheral info')) }));
 
 jest.mock('../BatteryService', () => jest.fn( () => null));
 jest.mock("react-native", () => {
@@ -82,6 +85,13 @@ describe("<ServicesList />", () => {
         act( () =>{ callLastRegisteredPeripheralConnectionListener(emitterMock.addListener, mockConnectedPeripheral.id);} );
         await expect(BatteryService).toHaveBeenLastCalledWith({peripheral: mockConnectedPeripheral, connected: true}, {});
         await expect(BatteryService).toHaveBeenCalledTimes(2);
+    })
+
+    it("should should issue `retrieveServices` on peripheral connection", async () => {
+        act( () =>{ callLastRegisteredPeripheralDiscoverListener(emitterMock.addListener, mockPeripheral);} );
+        const mockConnectedPeripheral = {...mockPeripheral, connected: true};
+        act( () =>{ callLastRegisteredPeripheralConnectionListener(emitterMock.addListener, mockConnectedPeripheral.id);} );
+        await expect(BleManager.retrieveServices).toHaveBeenLastCalledWith(mockConnectedPeripheral.id);
     })
 
     it("should render new peripheral disconnection", async () => {
