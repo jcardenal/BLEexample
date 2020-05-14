@@ -13,6 +13,8 @@ in order to include 3rd party modules and libraries in the project
 needed to include BLE support
 * [react-native-testing-library](https://github.com/callstack/react-native-testing-library), the `react-native` version of `react-testing-library`
 * [jest-native](https://github.com/testing-library/jest-native), provides additional matchers as `toBeDisabled`, `toHaveProp`...
+* [buffer](https://github.com/feross/buffer), to manipulate byte conversions when reading/writing data
+
 # Implemented behaviour
 
 What does this BLE test App do? Well, not much. In addition, the behaviour was implemented
