@@ -7,21 +7,28 @@ const ServicesList = () => {
     const emitter = useContext(EmitterContext);
     const [peripherals, setPeripherals] = useState(new Map());
 
+    const changePeripheralConnectionStatus = (peripheralId, status) =>{
+            let peripheral = peripherals.get(peripheralId);
+            if (peripheral) {
+                peripheral = {...peripheral, connected: status};
+                setPeripherals(new Map(peripherals.set(peripheralId, peripheral)));
+            }
+    }
+
     useEffect(()=>{
           emitter.addListener('BleManagerDiscoverPeripheral', (id, name, rssi, advertising) => {
-                    peripheral = { ...{}, id, name, rssi, advertising, connected: false };
+                    const peripheral = { ...{}, id, name, rssi, advertising, connected: false };
                     console.log('Discovered peripheral: ', peripheral);
                     setPeripherals(new Map(peripherals.set(id, peripheral)));
           });
           emitter.addListener('BleManagerConnectPeripheral', (peripheralId, status) => {
                     console.log('Connected peripheralId: ', peripheralId);
-                    peripheral = peripherals.get(peripheralId);
-                    if (peripheral) {
-                        peripheral = {...peripheral, connected: true};
-                        setPeripherals(new Map(peripherals.set(peripheralId, peripheral)));
-                    }
+                    changePeripheralConnectionStatus(peripheralId, true);
           });
-          emitter.addListener('BleManagerDisconnectPeripheral', () => {});
+          emitter.addListener('BleManagerDisconnectPeripheral', (peripheralId, status) => {
+                    console.log("Disconnected peripheralId: ", peripheralId);
+                    changePeripheralConnectionStatus(peripheralId, false);
+          });
     }, []);
 
     const drawPeripherals = () => {
