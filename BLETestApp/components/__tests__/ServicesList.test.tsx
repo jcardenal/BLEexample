@@ -22,6 +22,20 @@ jest.mock("react-native", () => {
 
 const emitterMock = {addListener: jest.fn()}
 
+const mockPeripheral = {
+                         id: '00-11-22',
+                         name: 'service1',
+                         rssi: 117,
+                         advertising: {
+                            isConnectable: true,
+                            serviceUUIDs: ['00-11', '11-22'],
+                            manufacturerData: {},
+                            serviceData: {},
+                            txPowerLevel: 23
+                         },
+                         connected: false
+                     };
+
 describe("<ServicesList />", () => {
 
     let container;
@@ -57,23 +71,19 @@ describe("<ServicesList />", () => {
 
 
     it("should add a new peripheral on discovery", async () => {
-        const mockPeripheral = {
-                                 id: '00-11-22',
-                                 name: 'service1',
-                                 rssi: 117,
-                                 advertising: {
-                                    isConnectable: true,
-                                    serviceUUIDs: ['00-11', '11-22'],
-                                    manufacturerData: {},
-                                    serviceData: {},
-                                    txPowerLevel: 23
-                                 },
-                                 connected: false
-                             };
         act( () =>{ callLastRegisteredPeripheralDiscoverListener(emitterMock.addListener, mockPeripheral);} );
         await expect(BatteryService).toHaveBeenCalledWith({peripheral: mockPeripheral, connected: false}, {});
         await expect(BatteryService).toHaveBeenCalledTimes(1);
     })
+
+    it("should render new peripheral connection", async () => {
+        act( () =>{ callLastRegisteredPeripheralDiscoverListener(emitterMock.addListener, mockPeripheral);} );
+        const mockConnectedPeripheral = {...mockPeripheral, connected: true};
+        act( () =>{ callLastRegisteredPeripheralConnectionListener(emitterMock.addListener, mockConnectedPeripheral.id);} );
+        await expect(BatteryService).toHaveBeenLastCalledWith({peripheral: mockConnectedPeripheral, connected: true}, {});
+        await expect(BatteryService).toHaveBeenCalledTimes(2);
+    })
+
 })
 
 const callLastRegisteredPeripheralDiscoverListener = (mock, peripheral) => {
@@ -82,10 +92,10 @@ const callLastRegisteredPeripheralDiscoverListener = (mock, peripheral) => {
         discoverPeripheralListener(peripheral.id, peripheral.name, peripheral.rssi, peripheral.advertising);
 };
 
-const callLastRegisteredPeripheralConnectionListener = mock => {
+const callLastRegisteredPeripheralConnectionListener = (mock, peripheralId) => {
         const lastCall = findLastListenerCallFor('BleManagerConnectPeripheral', mock);
         const connectPeripheralListener = mock.mock.calls[lastCall][1];
-        connectPeripheralListener();
+        connectPeripheralListener(peripheralId);
 };
 
 const callLastRegisteredPeripheralDisconnectionListener = mock => {

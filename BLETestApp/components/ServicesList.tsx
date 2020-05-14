@@ -14,6 +14,12 @@ const ServicesList = () => {
                     setPeripherals(new Map(peripherals.set(id, peripheral)));
           });
           emitter.addListener('BleManagerConnectPeripheral', (peripheralId, status) => {
+                    console.log('Connected peripheralId: ', peripheralId);
+                    peripheral = peripherals.get(peripheralId);
+                    if (peripheral) {
+                        peripheral = {...peripheral, connected: true};
+                        setPeripherals(new Map(peripherals.set(peripheralId, peripheral)));
+                    }
           });
           emitter.addListener('BleManagerDisconnectPeripheral', () => {});
     }, []);
