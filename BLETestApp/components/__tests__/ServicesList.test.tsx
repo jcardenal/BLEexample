@@ -45,6 +45,17 @@ describe("<ServicesList />", () => {
                 .toHaveBeenCalledWith('BleManagerDiscoverPeripheral', expect.any(Function));
     });
 
+    it("should register BLE listener for peripheral connected", async () => {
+        await expect(emitterMock.addListener)
+                .toHaveBeenCalledWith('BleManagerConnectPeripheral', expect.any(Function));
+    });
+
+    it("should register BLE listener for peripheral disconnected", async () => {
+        await expect(emitterMock.addListener)
+                .toHaveBeenCalledWith('BleManagerDisconnectPeripheral', expect.any(Function));
+    });
+
+
     it("should add a new peripheral on discovery", async () => {
         const mockPeripheral = {
                                  id: '00-11-22',
@@ -56,16 +67,36 @@ describe("<ServicesList />", () => {
                                     manufacturerData: {},
                                     serviceData: {},
                                     txPowerLevel: 23
-                                 }
+                                 },
+                                 connected: false
                              };
-        act( () =>{ discoverNewService(emitterMock.addListener, mockPeripheral);} );
-        await expect(BatteryService).toHaveBeenCalledWith({peripheral: mockPeripheral}, {});
+        act( () =>{ callLastRegisteredPeripheralDiscoverListener(emitterMock.addListener, mockPeripheral);} );
+        await expect(BatteryService).toHaveBeenCalledWith({peripheral: mockPeripheral, connected: false}, {});
         await expect(BatteryService).toHaveBeenCalledTimes(1);
     })
 })
 
-const discoverNewService = (mock, service) => {
-        const lastCall = mock.mock.calls.length -1;
-        const stopScanListener = mock.mock.calls[lastCall][1];
-        stopScanListener(service.id, service.name, service.rssi, service.advertising);
+const callLastRegisteredPeripheralDiscoverListener = (mock, peripheral) => {
+        const lastCall = findLastListenerCallFor('BleManagerDiscoverPeripheral', mock);
+        const discoverPeripheralListener = mock.mock.calls[lastCall][1];
+        discoverPeripheralListener(peripheral.id, peripheral.name, peripheral.rssi, peripheral.advertising);
+};
+
+const callLastRegisteredPeripheralConnectionListener = mock => {
+        const lastCall = findLastListenerCallFor('BleManagerConnectPeripheral', mock);
+        const connectPeripheralListener = mock.mock.calls[lastCall][1];
+        connectPeripheralListener();
+};
+
+const callLastRegisteredPeripheralDisconnectionListener = mock => {
+        const lastCall = findLastListenerCallFor('BleManagerDisconnectPeripheral', mock);
+        const disconnectPeripheralListener = mock.mock.calls[lastCall][1];
+        disconnectPeripheralListener();
+};
+
+const findLastListenerCallFor =  (listenerName, mock) => {
+      const callsFound = mock.mock.calls.map( (call, index) => call[0] == listenerName ? index : undefined);
+      const callsFiltered = callsFound.filter(x => x !== undefined);
+      const lastCall = callsFiltered.slice(-1)[0];
+      return lastCall;
 };

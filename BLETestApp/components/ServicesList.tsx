@@ -9,15 +9,21 @@ const ServicesList = () => {
 
     useEffect(()=>{
           emitter.addListener('BleManagerDiscoverPeripheral', (id, name, rssi, advertising) => {
-                    peripheral = { ...{}, id, name, rssi, advertising };
+                    peripheral = { ...{}, id, name, rssi, advertising, connected: false };
                     console.log('Discovered peripheral: ', peripheral);
                     setPeripherals(new Map(peripherals.set(id, peripheral)));
-                 }
-          );
+          });
+          emitter.addListener('BleManagerConnectPeripheral', (peripheralId, status) => {
+          });
+          emitter.addListener('BleManagerDisconnectPeripheral', () => {});
     }, []);
 
     const drawPeripherals = () => {
-        return [...peripherals.keys()].map(k => (<BatteryService peripheral={peripherals.get(k)} />));
+        return [...peripherals.keys()].map(k => (
+                    <BatteryService
+                        peripheral={peripherals.get(k)}
+                        connected={peripherals.get(k).connected}
+                    />));
     }
 
     return (
