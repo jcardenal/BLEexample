@@ -40,7 +40,7 @@ const ServicesList = () => {
 
     const drawPeripherals = () => {
         return [...peripherals.keys()].map(k => (
-                    <BatteryService
+                    <BatteryService key={k}
                         peripheral={peripherals.get(k)}
                         connected={peripherals.get(k).connected}
                     />));
