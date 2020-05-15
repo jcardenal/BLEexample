@@ -1,13 +1,12 @@
 {
-  "main": "node_modules/expo/AppEntry.js",
   "scripts": {
-    "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
+    "start": "react-native start",
+    "android": "react-native run-android",
+    "ios": "react-native run-ios",
     "web": "expo start --web",
-    "eject": "expo eject",
     "test": "jest",
-    "test-dev": "jest --watch"
+    "test-dev": "jest --watch",
+    "bundle": "react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res"
   },
   "jest": {
     "preset": "jest-expo"
@@ -16,26 +15,31 @@
     "@types/jest": "^25.2.1",
     "buffer": "^5.6.0",
     "expo": "~37.0.3",
+    "expo-splash-screen": "^0.1.1",
+    "expo-updates": "~0.2.1",
     "react": "~16.9.0",
     "react-dom": "~16.9.0",
-    "react-native": "https://github.com/expo/react-native/archive/sdk-37.0.1.tar.gz",
+    "react-native": "~0.61.5",
     "react-native-ble-manager": "^7.2.0",
+    "react-native-gesture-handler": "~1.6.0",
     "react-native-material-ui": "^1.30.1",
+    "react-native-reanimated": "~1.7.0",
     "react-native-screens": "~2.2.0",
+    "react-native-unimodules": "~0.9.0",
     "react-native-vector-icons": "^6.6.0",
-    "react-native-web": "~0.11.7",
-    "expo-updates": "~0.1.2",
-    "expo-splash-screen": "~0.1.1"
+    "react-native-web": "~0.11.7"
   },
   "devDependencies": {
     "@babel/core": "^7.8.6",
+    "babel-jest": "~25.2.6",
+    "jest": "~25.2.6",
+    "react-test-renderer": "^16.13.1",
     "@testing-library/jest-native": "^3.1.0",
     "@types/react": "~16.9.23",
     "@types/react-native": "~0.61.17",
     "babel-preset-expo": "~8.1.0",
     "jest-expo": "^37.0.0",
     "react-native-testing-library": "^1.13.2",
-    "react-test-renderer": "^16.13.1",
     "typescript": "~3.8.3"
   },
   "private": true

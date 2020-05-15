@@ -18,6 +18,13 @@
     },
     "assetBundlePatterns": [
       "**/*"
-    ]
+    ],
+    "ios": {
+      "bundleIdentifier": "es.jcardenal.example.bletest"
+    },
+    "android": {
+      "package": "es.jcardenal.example.bletest"
+    },
+    "entryPoint": "node_modules/expo/AppEntry.js"
   }
 }

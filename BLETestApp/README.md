@@ -42,7 +42,14 @@ following a phased approach:
     
 ## After being ejected from `expo` 
 
-(TBD)
+* use `npm run android` to run the application in a USB connected device
+* use `npx react-native log-android` to see the `console.log` output
+* remember to include the required permissions for BLE access in `AndroidManifest.xml`:
+            
+            <uses-permission android:name="android.permission.BLUETOOTH"/>
+            <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
+            <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
 
 # Interesting pointers
  
@@ -50,3 +57,6 @@ following a phased approach:
   * [Testing with Jest](https://docs.expo.io/guides/testing-with-jest/)
   * [Using Typescript](https://docs.expo.io/guides/typescript/)
   * [User Interface Component Libraries](https://docs.expo.io/guides/userinterface/)
+  
+* Troubleshooting (after `expo eject`):
+  * [Solved: Unable to load script from assets ‘index.android.bundle’](https://medium.com/@adityasingh_32512/solved-unable-to-load-script-from-assets-index-android-bundle-bdc5e3a3d5ff)
