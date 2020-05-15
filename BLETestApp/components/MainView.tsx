@@ -9,7 +9,7 @@ const MainView = () => {
   return (
         <View style={styles.container}>
           <Toolbar style={{ container: { marginTop: 25 } }} centerElement="BLE Test App" />
-          <ServicesList list={['service1','service2']} />
+          <ServicesList />
           <ScanningButton />
         </View>
   );
