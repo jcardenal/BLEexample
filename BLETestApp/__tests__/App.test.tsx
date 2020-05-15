@@ -37,17 +37,4 @@ describe("<App />", () => {
             render( <App />);
             await expect(ReactNative.NativeEventEmitter).toHaveBeenCalled();
         });
-
-        it("should register BLE listener for peripheral connected", async () => {
-            render( <App emitter={mockEmitter} />);
-            await expect(mockEmitter.addListener)
-                    .toHaveBeenCalledWith('BleManagerConnectPeripheral', expect.any(Function));
-        });
-
-        it("should register BLE listener for peripheral disconnected", async () => {
-            render( <App emitter={mockEmitter} />);
-            await expect(mockEmitter.addListener)
-                    .toHaveBeenCalledWith('BleManagerDisconnectPeripheral', expect.any(Function));
-        });
-
 })

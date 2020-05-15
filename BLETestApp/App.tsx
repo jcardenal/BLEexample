@@ -22,8 +22,6 @@ const App = ({emitter}) => {
                              // Success code
                              console.log('BLE support module initialized');
                            });
-                   emitter.addListener('BleManagerConnectPeripheral', () => {});
-                   emitter.addListener('BleManagerDisconnectPeripheral', () => {});
                    }, []);
 
 
