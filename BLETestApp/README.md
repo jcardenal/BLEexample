@@ -30,7 +30,20 @@ following a phased approach:
 
 * Control (write) the blinking frequency of the on-board blue led of the peripheral using a slider
  
- 
+# Executing the app
+
+## While in `expo`
+
+* use `npm run android` to run the application in a USB connected device
+* `console.log` output can be seen following this procedure:
+    1. Shake the device so the development menu is presented
+    2. Choose the `Debug remote JS` option; this will open a tab on `Chrome`
+    3. On the tab opened on `Chrome`, go to the console using the `Developer Tools` option
+    
+## After being ejected from `expo` 
+
+(TBD)
+
 # Interesting pointers
  
 * Expo guides:
