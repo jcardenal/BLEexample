@@ -1,6 +1,6 @@
 import React, {useState, useEffect, useContext} from 'react';
-import {Text} from 'react-native';
-import { Button, Card } from 'react-native-material-ui';
+import {Text, StyleSheet, View} from 'react-native';
+import { Button } from 'react-native-material-ui';
 import BleManager from 'react-native-ble-manager';
 import Buffer from 'buffer';
 
@@ -38,13 +38,33 @@ const BatteryService = ({peripheral, connected}) => {
     }
 
     return (
-    <Card>
-        <Text>{peripheral.name ? peripheral.name : 'N/A'}</Text>
-        <Text>Battery: {percentage}</Text>
-        <Button disabled={connectButtonDisabled} raised text={getButtonText()} onPress={handleConnectButtonPressed} />
-        <Button disabled={!connected} text="read" onPress={handleReadButton}/>
-    </Card>
+    <View style={styles.container}>
+        <Text style={styles.baseText} >{peripheral.name ? peripheral.name : 'N/A'}</Text>
+        <Text style={styles.batteryText} >Battery: {percentage}</Text>
+        <Button disabled={connectButtonDisabled} primary raised text={getButtonText()} onPress={handleConnectButtonPressed} />
+        <Button disabled={!connected} accent raised text="read" onPress={handleReadButton}/>
+    </View>
     )
 }
+
+const styles = StyleSheet.create({
+  baseText: {
+    fontFamily: "Cochin",
+    fontSize: 20,
+    fontWeight: "bold"
+  },
+  batteryText: {
+    fontSize: 16,
+  },
+  container: {
+    flex: 1,
+    justifyContent: "space-between",
+    borderColor: "green",
+    borderWidth: 1,
+    borderRadius: 20,
+    padding: 10,
+  }
+});
+
 
 export default BatteryService;

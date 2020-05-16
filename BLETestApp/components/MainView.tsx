@@ -8,7 +8,7 @@ const MainView = () => {
 
   return (
         <View style={styles.container}>
-          <Toolbar style={{ container: { marginTop: 25 } }} centerElement="BLE Test App" />
+          <Toolbar centerElement="BLE Test App" />
           <ServicesList />
           <ScanningButton />
         </View>
@@ -21,6 +21,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'space-between',
+    marginBottom: 15,
   },
 });
 

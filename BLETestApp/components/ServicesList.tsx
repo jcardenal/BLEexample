@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useContext} from 'react';
-import {ScrollView, Text} from 'react-native'
+import {ScrollView, Text, StyleSheet} from 'react-native'
 import BatteryService from './BatteryService';
 import BleManager from 'react-native-ble-manager';
 import {EmitterContext} from '../App';
@@ -47,11 +47,19 @@ const ServicesList = () => {
     }
 
     return (
-        <ScrollView>
+        <ScrollView style={styles.container}>
             {drawPeripherals()}
         </ScrollView>
     )
 }
 
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    padding: 10,
+  },
+});
 
 export default ServicesList;
