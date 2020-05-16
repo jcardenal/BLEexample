@@ -108,7 +108,7 @@ describe("<ServicesList />", () => {
 const callLastRegisteredPeripheralDiscoverListener = (mock, peripheral) => {
         const lastCall = findLastListenerCallFor('BleManagerDiscoverPeripheral', mock);
         const discoverPeripheralListener = mock.mock.calls[lastCall][1];
-        discoverPeripheralListener(peripheral.id, peripheral.name, peripheral.rssi, peripheral.advertising);
+        discoverPeripheralListener(peripheral);
 };
 
 const callLastRegisteredPeripheralConnectionListener = (mock, peripheralId) => {

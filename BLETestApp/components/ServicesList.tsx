@@ -23,10 +23,10 @@ const ServicesList = () => {
     }
 
     useEffect(()=>{
-          emitter.addListener('BleManagerDiscoverPeripheral', (id, name, rssi, advertising) => {
-                    const peripheral = { ...{}, id, name, rssi, advertising, connected: false };
-                    console.log('Discovered peripheral: ', peripheral);
-                    setPeripherals(new Map(peripherals.set(id, peripheral)));
+          emitter.addListener('BleManagerDiscoverPeripheral', (foundPeripheral) => {
+                    const peripheral = { ...foundPeripheral, connected: false };
+                    console.log(`Discovered peripheral: ${peripheral.id} - ${peripheral.name}`);
+                    setPeripherals(new Map(peripherals.set(peripheral.id, peripheral)));
           });
           emitter.addListener('BleManagerConnectPeripheral', (peripheralId, status) => {
                     console.log('Connected peripheralId: ', peripheralId);
