@@ -114,13 +114,13 @@ const callLastRegisteredPeripheralDiscoverListener = (mock, peripheral) => {
 const callLastRegisteredPeripheralConnectionListener = (mock, peripheralId) => {
         const lastCall = findLastListenerCallFor('BleManagerConnectPeripheral', mock);
         const connectPeripheralListener = mock.mock.calls[lastCall][1];
-        connectPeripheralListener(peripheralId);
+        connectPeripheralListener({peripheral: peripheralId, status:0});
 };
 
 const callLastRegisteredPeripheralDisconnectionListener = (mock, peripheralId) => {
         const lastCall = findLastListenerCallFor('BleManagerDisconnectPeripheral', mock);
         const disconnectPeripheralListener = mock.mock.calls[lastCall][1];
-        disconnectPeripheralListener(peripheralId);
+        disconnectPeripheralListener({peripheral: peripheralId, status: 0});
 };
 
 const findLastListenerCallFor =  (listenerName, mock) => {
