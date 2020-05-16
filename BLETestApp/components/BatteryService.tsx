@@ -15,10 +15,12 @@ const BatteryService = ({peripheral, connected}) => {
     const handleConnectButtonPressed = () => {
         if (connected) {
             setConnectButtonDisabled(true);
-            BleManager.disconnect(peripheral.id);
+            BleManager.disconnect(peripheral.id)
+                .then(() => setConnectButtonDisabled(false));
         } else {
             setConnectButtonDisabled(true);
-            BleManager.connect(peripheral.id);
+            BleManager.connect(peripheral.id)
+                .then(() => setConnectButtonDisabled(false));
         }
     }
 

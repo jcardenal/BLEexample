@@ -4,8 +4,8 @@ import {act, fireEvent, render, waitForElement} from 'react-native-testing-libra
 import BatteryService from '../BatteryService';
 import BleManager from 'react-native-ble-manager';
 
-jest.mock('react-native-ble-manager', () => ({ connect: jest.fn(),
-                                               disconnect: jest.fn(),
+jest.mock('react-native-ble-manager', () => ({ connect: jest.fn(() => Promise.resolve()),
+                                               disconnect: jest.fn(() => Promise.resolve()),
                                                read: jest.fn(() => {
                                                    const uint8 = new Uint8Array(1);
                                                    uint8[0] = 93;
