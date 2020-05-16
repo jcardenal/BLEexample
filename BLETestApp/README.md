@@ -22,14 +22,17 @@ following a phased approach:
 
 ### Initial implementation
 
-* Start/stop scanning for BLE peripherals implementing the `Battery Service` (see [Peripheral](../Peripheral/README.md))
-* Connect to/disconnect from a found BLE peripheral
-* Read the `Battery Level` characteristic from the peripheral, when connected
+* [ ] Start/stop scanning for BLE peripherals implementing the `Battery Service` (see [Peripheral](../Peripheral/README.md))
+* [ ] Connect to/disconnect from a found BLE peripheral
+* [ ] Read the `Battery Level` characteristic from the peripheral, when connected
 
 ### Improvements (some of them already implemented)
 
-* Control (write) the blinking frequency of the on-board blue led of the peripheral using a slider
- 
+* [ ] Control (write) the blinking frequency of the on-board blue led of the peripheral using a slider
+* [ ] Display errors
+* [ ] Check if bluetooth is enabled or not and ask for enablement when needed
+* [ ] Check if location permit has been granted by user (see below)
+
 # Executing the app
 
 ## While in `expo`
@@ -42,13 +45,30 @@ following a phased approach:
     
 ## After being ejected from `expo` 
 
-* use `npm run android` to run the application in a USB connected device
-* use `npx react-native log-android` to see the `console.log` output
-* remember to include the required permissions for BLE access in `AndroidManifest.xml`:
+**IMPORTANT NOTE:** Explicit permission to access location has to be granted by the user for this application to be able
+to scan devices. For this, in `Settings > Apps and notifications > App permissions > Location Permissions` for the application,
+the permissions have to be turned on.
+
+Ejecting from `expo` can be repeated as many times as needed (for example, to regenerate the code after changes in JS code).
+After the first ejection from `expo` and before repeating the eject, it is advisable to delete the `android/` and
+`ios/` folders, and run `expo eject` again, and then:
+
+* use `npx @expo/configure-splash-screen --platform "all" white ./assets/splash.png` to set the correct splash screen
+* remember to include the required permissions and features for BLE access in `AndroidManifest.xml`:
             
             <uses-permission android:name="android.permission.BLUETOOTH"/>
             <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
             <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+            <uses-feature android:name="android.hardware.bluetooth_le" android:required="true" />
+
+* create empty folder `android/app/src/main/assets` and use `npm run bundle` to avoid the problem pointed 
+* use `npm run android` to run the application in a USB connected device
+* use `npx react-native log-android` to see the `console.log` output
+
+**If only the JS is changed**, a quicker method to update the application to be run in a device connected through USB is:
+
+* After the change in JS is made, run `npm run bundle`
+* then run `npm run android`
 
 
 # Interesting pointers
