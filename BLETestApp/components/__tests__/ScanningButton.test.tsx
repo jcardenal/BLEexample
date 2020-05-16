@@ -3,6 +3,7 @@ import {act, fireEvent, render, waitForElement} from 'react-native-testing-libra
 import ScanningButton, {SCAN_PERIOD_IN_SECONDS} from '../ScanningButton';
 import BleManager from 'react-native-ble-manager';
 import {EmitterContext} from '../../App';
+import {SERVICE_UUID} from '../BatteryService';
 import * as ReactNative from 'react-native';
 
 jest.mock('react-native-ble-manager', () => ({ scan: jest.fn( () => Promise.resolve(['uuid'])),
@@ -54,7 +55,7 @@ describe("<ScanningButton />", () => {
     });
     it("should call 'scan' on button press and then, 'stopScan'", async () => {
         fireEvent.press(container.getByText("START SCAN"));
-        await expect(BleManager.scan).toHaveBeenCalledWith([], SCAN_PERIOD_IN_SECONDS, true);
+        await expect(BleManager.scan).toHaveBeenCalledWith([SERVICE_UUID], SCAN_PERIOD_IN_SECONDS, true);
         await waitForElement(() => container.getByText('STOP SCAN'));
         fireEvent.press(container.getByText("STOP SCAN"));
         await expect(BleManager.stopScan).toHaveBeenCalledWith();

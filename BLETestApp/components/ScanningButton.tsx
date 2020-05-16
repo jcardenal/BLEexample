@@ -2,6 +2,8 @@ import React, {useState, useEffect, useContext} from 'react';
 import { Button } from 'react-native-material-ui';
 import BleManager from 'react-native-ble-manager';
 import {EmitterContext} from '../App';
+import {SERVICE_UUID} from './BatteryService';
+
 
 export const SCAN_PERIOD_IN_SECONDS = 5;
 
@@ -27,7 +29,7 @@ const ScanningButton = () => {
         setScanning(false);
         setButtonText("Start Scan");
     } else {
-        BleManager.scan([], SCAN_PERIOD_IN_SECONDS, true)
+        BleManager.scan([SERVICE_UUID], SCAN_PERIOD_IN_SECONDS, true)
           .then(() => {
             console.log('BLE Scan started');
           });

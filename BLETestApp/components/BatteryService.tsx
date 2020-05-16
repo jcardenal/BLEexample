@@ -4,7 +4,7 @@ import { Button, Card } from 'react-native-material-ui';
 import BleManager from 'react-native-ble-manager';
 import Buffer from 'buffer';
 
-const SERVICE_UUID = "180F";
+export const SERVICE_UUID = "180F";
 const CHARACTERISTIC_UUID = "2A19";
 
 const BatteryService = ({peripheral, connected}) => {
