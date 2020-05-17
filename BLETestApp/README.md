@@ -28,7 +28,7 @@ following a phased approach:
 
 ### Improvements (some of them already implemented)
 
-* [ ] Check if bluetooth is enabled or not and ask for enablement when needed
+* [x] Check if bluetooth is enabled or not and ask for enablement when needed. Exit app if refused by user
 * [ ] Check if location permit has been granted by user (see below)
 * [ ] Subscribe to notifications regarding change in battery level
 * [ ] Control (write) the blinking frequency of the on-board blue led of the peripheral using a slider

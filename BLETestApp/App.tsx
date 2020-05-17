@@ -1,5 +1,5 @@
 import React, {useEffect, createContext} from 'react';
-import {NativeEventEmitter, NativeModules} from 'react-native';
+import {NativeEventEmitter, NativeModules, BackHandler} from 'react-native';
 import { ThemeContext, getTheme, COLOR } from 'react-native-material-ui';
 import MainView from './components/MainView';
 import BleManager from 'react-native-ble-manager';
@@ -19,8 +19,15 @@ const App = ({emitter}) => {
 
   useEffect(() => {BleManager.start()
                         .then(() => {
-                             // Success code
-                             console.log('BLE support module initialized');
+                            console.log('BLE support module initialized');
+                            BleManager.enableBluetooth()
+                              .then(() => {
+                                console.log('The bluetooth is already enabled or the user confirm');
+                              })
+                              .catch((error) => {
+                                console.log('The user refuses to enable bluetooth. Exiting ...');
+                                BackHandler.exitApp();
+                              });
                            });
                    }, []);
 
