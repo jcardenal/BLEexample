@@ -22,16 +22,17 @@ following a phased approach:
 
 ### Initial implementation
 
-* [ ] Start/stop scanning for BLE peripherals implementing the `Battery Service` (see [Peripheral](../Peripheral/README.md))
-* [ ] Connect to/disconnect from a found BLE peripheral
-* [ ] Read the `Battery Level` characteristic from the peripheral, when connected
+* [x] Start/stop scanning for BLE peripherals implementing the `Battery Service` (see [Peripheral](../Peripheral/README.md))
+* [x] Connect to/disconnect from a found BLE peripheral
+* [x] Read the `Battery Level` characteristic from the peripheral, when connected
 
 ### Improvements (some of them already implemented)
 
-* [ ] Control (write) the blinking frequency of the on-board blue led of the peripheral using a slider
-* [ ] Display errors
 * [ ] Check if bluetooth is enabled or not and ask for enablement when needed
 * [ ] Check if location permit has been granted by user (see below)
+* [ ] Subscribe to notifications regarding change in battery level
+* [ ] Control (write) the blinking frequency of the on-board blue led of the peripheral using a slider
+* [ ] Display errors
 
 # Executing the app
 
