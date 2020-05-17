@@ -3,6 +3,7 @@ import {render, flushMicrotasksQueue} from 'react-native-testing-library';
 import App, {bleManagerEmitter} from '../App';
 import * as BleManager from 'react-native-ble-manager';
 import * as ReactNative from 'react-native';
+import * as Permissions from 'expo-permissions';
 
 jest.mock('react-native-ble-manager', () => ({start: jest.fn( () => Promise.resolve(true)),
                                               enableBluetooth: jest.fn( () => Promise.resolve(true))}) );
@@ -22,9 +23,17 @@ jest.mock("react-native", () => {
       );
 });
 
+jest.mock('expo-permissions', () => ({askAsync: jest.fn( () => Promise.resolve({status: 'denied'})),
+                                      }) );
+
+
 const mockEmitter = {addListener: jest.fn()};
 
 describe("<App />", () => {
+
+        beforeEach(() => {
+            ReactNative.BackHandler.exitApp.mockClear();
+        });
 
         it("should render App", () => {
             render( <App /> );
@@ -47,6 +56,16 @@ describe("<App />", () => {
             expect(ReactNative.BackHandler.exitApp).toHaveBeenCalled();
         });
 
+        it("should check if LOCATION permission is granted", async () => {
+            render( <App />);
+            await expect(Permissions.askAsync).toHaveBeenCalled();
+        });
+
+        it("should terminate app if LOCATION not enabled and user refuses enabling it", async () => {
+            render( <App />);
+            await flushMicrotasksQueue();
+            await expect(ReactNative.BackHandler.exitApp).toHaveBeenCalled();
+        });
 
         it("should create 'NativeEventEmitter'", async () => {
             render( <App />);
