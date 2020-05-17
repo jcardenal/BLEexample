@@ -75,7 +75,7 @@ describe("<ServicesList />", () => {
 
     it("should add a new peripheral on discovery", async () => {
         act( () =>{ callLastRegisteredPeripheralDiscoverListener(emitterMock.addListener, mockPeripheral);} );
-        await expect(BatteryService).toHaveBeenCalledWith({peripheral: mockPeripheral, connected: false}, {});
+        await expect(BatteryService).toHaveBeenCalledWith({peripheral: mockPeripheral, connected: false, onRemoval: expect.any(Function)}, {});
         await expect(BatteryService).toHaveBeenCalledTimes(1);
     })
 
@@ -83,7 +83,7 @@ describe("<ServicesList />", () => {
         act( () =>{ callLastRegisteredPeripheralDiscoverListener(emitterMock.addListener, mockPeripheral);} );
         const mockConnectedPeripheral = {...mockPeripheral, connected: true};
         act( () =>{ callLastRegisteredPeripheralConnectionListener(emitterMock.addListener, mockConnectedPeripheral.id);} );
-        await expect(BatteryService).toHaveBeenLastCalledWith({peripheral: mockConnectedPeripheral, connected: true}, {});
+        await expect(BatteryService).toHaveBeenLastCalledWith({peripheral: mockConnectedPeripheral, connected: true, onRemoval: expect.any(Function)}, {});
         await expect(BatteryService).toHaveBeenCalledTimes(2);
     })
 
@@ -99,7 +99,7 @@ describe("<ServicesList />", () => {
         const mockConnectedPeripheral = {...mockPeripheral, connected: true};
         act( () =>{ callLastRegisteredPeripheralConnectionListener(emitterMock.addListener, mockConnectedPeripheral.id);} );
         act( () =>{ callLastRegisteredPeripheralDisconnectionListener(emitterMock.addListener, mockPeripheral.id);} );
-        await expect(BatteryService).toHaveBeenLastCalledWith({peripheral: mockPeripheral, connected: false}, {});
+        await expect(BatteryService).toHaveBeenLastCalledWith({peripheral: mockPeripheral, connected: false, onRemoval: expect.any(Function)}, {});
         await expect(BatteryService).toHaveBeenCalledTimes(3);
     })
 

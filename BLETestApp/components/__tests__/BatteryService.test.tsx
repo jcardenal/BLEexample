@@ -2,7 +2,7 @@ import React from 'react';
 import '@testing-library/jest-native/extend-expect';
 import {act, fireEvent, render, waitForElement} from 'react-native-testing-library';
 import BatteryService from '../BatteryService';
-import BleManager from 'react-native-ble-manager';
+import * as BleManager from 'react-native-ble-manager';
 
 jest.mock('react-native-ble-manager', () => ({ connect: jest.fn(() => Promise.resolve()),
                                                disconnect: jest.fn(() => Promise.resolve()),
@@ -10,7 +10,8 @@ jest.mock('react-native-ble-manager', () => ({ connect: jest.fn(() => Promise.re
                                                    const uint8 = new Uint8Array(1);
                                                    uint8[0] = 93;
                                                    return Promise.resolve(uint8);
-                                               })
+                                               }),
+                                               removePeripheral: jest.fn(() => Promise.resolve()),
                                              }));
 
 const mockPeripheral = {
@@ -27,12 +28,16 @@ const mockPeripheral = {
                          connected: false
                      };
 
+
+
 describe("<BatteryService />", () => {
 
     beforeEach(() => {
         BleManager.connect.mockClear();
         BleManager.disconnect.mockClear();
         BleManager.read.mockClear();
+        BleManager.removePeripheral.mockClear();
+        jest.useFakeTimers();
     });
 
     describe("when peripheral is not connected", () => {
@@ -67,7 +72,6 @@ describe("<BatteryService />", () => {
 
         it("should request connection when 'CONNECT' pressed", async () => {
             fireEvent.press(container.getByText("CONNECT"));
-            await expect(container.getByText("CONNECT")).toBeDisabled();
             await expect(BleManager.connect).toHaveBeenCalledWith(mockPeripheral.id);
         })
     })
@@ -97,15 +101,38 @@ describe("<BatteryService />", () => {
             await expect(BleManager.read).toHaveBeenLastCalledWith(mockPeripheral.id, "180F", "2A19" );
         })
 
-        it("should render 'Battery: 93%' message", async () => {
+        it("should render 'Battery: 93%' message",async () => {
+            jest.useRealTimers();
             fireEvent.press(container.getByText("READ"));
             await waitForElement(() => container.getByText("Battery: 93%"));
         })
 
         it("should request disconnection when 'DISCONNECT' pressed", async () => {
             fireEvent.press(container.getByText("DISCONNECT"));
-            await expect(container.getByText("DISCONNECT")).toBeDisabled();
             await expect(BleManager.disconnect).toHaveBeenCalledWith(mockPeripheral.id);
         })
+    })
+
+    describe("when removing peripheral", () => {
+        let container;
+        const noNamedMockPeripheral = {...mockPeripheral, name: undefined};
+        const removalCallbackMock = jest.fn();
+        beforeEach(() => {
+          container = render(
+                <BatteryService peripheral={noNamedMockPeripheral} connected={false} onRemoval={removalCallbackMock} />
+              );
+        });
+
+        it("should disconnect and remove peripheral", async () => {
+            fireEvent.press(container.getByText("REMOVE"));
+            await expect(BleManager.disconnect).toHaveBeenCalledWith(mockPeripheral.id);
+            await expect(BleManager.removePeripheral).toHaveBeenCalledWith(mockPeripheral.id);
+        })
+
+        it("should call removal callback", async () => {
+            fireEvent.press(container.getByText("REMOVE"));
+            await expect(removalCallbackMock).toHaveBeenCalledWith(mockPeripheral.id);
+        })
+
     })
 })

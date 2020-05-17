@@ -31,7 +31,7 @@ following a phased approach:
 
 * [x] Check if bluetooth is enabled or not and ask for enablement when needed. Exit app if refused by user
 * [x] Check if location permit has been granted by user (see below). Exit app if refused by user
-* [ ] Add RESET button to clear all the discovered peripherals
+* [ ] Add REMOVE button to remove discovered peripherals
 * [ ] Do not allow operations on peripherals while scanning
 * [ ] Subscribe to notifications regarding change in battery level
 * [ ] Control (write) the blinking frequency of the on-board blue led of the peripheral using a slider

@@ -22,11 +22,20 @@ const ServicesList = () => {
             }
     }
 
+    const removePeripheral = (peripheralId) => {
+        if (peripherals.delete(peripheralId)) {
+              console.log('Removing peripheralId: ', peripheralId);
+              setPeripherals(new Map(peripherals));
+        }
+    };
+
     useEffect(()=>{
           emitter.addListener('BleManagerDiscoverPeripheral', (foundPeripheral) => {
-                    const peripheral = { ...foundPeripheral, connected: false };
-                    console.log(`Discovered peripheral: ${peripheral.id} - ${peripheral.name}`);
-                    setPeripherals(new Map(peripherals.set(peripheral.id, peripheral)));
+                    if (! peripherals.has(foundPeripheral.id) ) {
+                        const peripheral = { ...foundPeripheral, connected: false };
+                        console.log(`Discovered peripheral: ${peripheral.id} - ${peripheral.name}`);
+                        setPeripherals(new Map(peripherals.set(peripheral.id, peripheral)));
+                    }
           });
           emitter.addListener('BleManagerConnectPeripheral', ({peripheral, status}) => {
                     console.log('Connected peripheralId: ', peripheral);
@@ -43,6 +52,7 @@ const ServicesList = () => {
                     <BatteryService key={k}
                         peripheral={peripherals.get(k)}
                         connected={peripherals.get(k).connected}
+                        onRemoval={removePeripheral}
                     />));
     }
 

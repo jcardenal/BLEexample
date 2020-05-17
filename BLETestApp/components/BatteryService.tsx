@@ -7,20 +7,15 @@ import Buffer from 'buffer';
 export const SERVICE_UUID = "180F";
 const CHARACTERISTIC_UUID = "2A19";
 
-const BatteryService = ({peripheral, connected}) => {
-    const [connectButtonDisabled, setConnectButtonDisabled] = useState<Boolean>(false)
+const BatteryService = ({peripheral, connected, onRemoval}) => {
     const [percentage, setPercentage] = useState<String>("unknown")
     const getButtonText = () =>  (connected ? "DISCONNECT" : "CONNECT")
 
-    const handleConnectButtonPressed = () => {
+    const handleConnectButtonPressed = async () => {
         if (connected) {
-            setConnectButtonDisabled(true);
-            BleManager.disconnect(peripheral.id)
-                .then(() => setConnectButtonDisabled(false));
+            await BleManager.disconnect(peripheral.id);
         } else {
-            setConnectButtonDisabled(true);
-            BleManager.connect(peripheral.id)
-                .then(() => setConnectButtonDisabled(false));
+            await BleManager.connect(peripheral.id);
         }
     }
 
@@ -37,15 +32,26 @@ const BatteryService = ({peripheral, connected}) => {
             });
     }
 
+    const handleRemoveButton = async () => {
+        await BleManager.disconnect(peripheral.id);
+        await BleManager.removePeripheral(peripheral.id);
+        onRemoval(peripheral.id);
+    }
+
     return (
     <View style={styles.container}>
         <Text style={styles.baseText} >{peripheral.name ? peripheral.name : 'N/A'}</Text>
         <Text style={styles.batteryText} >Battery: {percentage}</Text>
-        <Button disabled={connectButtonDisabled} primary raised text={getButtonText()} onPress={handleConnectButtonPressed} />
+        <Button primary raised text={getButtonText()} onPress={handleConnectButtonPressed} />
         <Button disabled={!connected} accent raised text="read" onPress={handleReadButton}/>
+        <Button raised text="remove" onPress={handleRemoveButton} />
     </View>
     )
 }
+
+BatteryService.defaultProps = {
+    onRemoval: () => {}
+};
 
 const styles = StyleSheet.create({
   baseText: {
