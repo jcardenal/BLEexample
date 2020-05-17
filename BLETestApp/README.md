@@ -14,6 +14,7 @@ needed to include BLE support
 * [react-native-testing-library](https://github.com/callstack/react-native-testing-library), the `react-native` version of `react-testing-library`
 * [jest-native](https://github.com/testing-library/jest-native), provides additional matchers as `toBeDisabled`, `toHaveProp`...
 * [buffer](https://github.com/feross/buffer), to manipulate byte conversions when reading/writing data
+* [App Icon Maker](https://appiconmaker.co/), to have the set of icons with different resolutions, from an original one 
 
 # Implemented behaviour
 
