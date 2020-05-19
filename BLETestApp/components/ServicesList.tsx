@@ -1,6 +1,6 @@
 import React, {useState, useEffect, useContext} from 'react';
 import {ScrollView, Text, StyleSheet} from 'react-native'
-import BatteryService from './BatteryService';
+import BatteryService, {SERVICE_UUID} from './BatteryService';
 import BleManager from 'react-native-ble-manager';
 import {EmitterContext} from '../App';
 
@@ -44,6 +44,22 @@ const ServicesList = () => {
           emitter.addListener('BleManagerDisconnectPeripheral', ({peripheral, status}) => {
                     console.log("Disconnected peripheralId: ", peripheral);
                     changePeripheralConnectionStatus(peripheral, false);
+          });
+
+          emitter.addListener('BleManagerStopScan', () => {
+                    console.log('Scan Stopped @ ServicesList');
+                    BleManager.getDiscoveredPeripherals([SERVICE_UUID])
+                          .then((peripheralsArray) => {
+                              console.log("Already discovered peripherals");
+                              peripheralsArray.forEach(p => {
+                                    console.log(`${p.id} - ${p.name}`);
+                                    if (! peripherals.has(p.id) ) {
+                                        const peripheral = { ...p, connected: false };
+                                        peripherals.set(peripheral.id, peripheral);
+                                    }
+                              }  );
+                              setPeripherals(new Map(peripherals));
+                          });
           });
     }, []);
 

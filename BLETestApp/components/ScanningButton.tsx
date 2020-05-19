@@ -14,6 +14,7 @@ const ScanningButton = () => {
 
   useEffect(() => {
         emitter.addListener('BleManagerStopScan', () => {
+                console.log('Scan Stopped');
                 setScanning(false);
                 setButtonText("Start Scan");
              }
