@@ -72,6 +72,10 @@ describe("<ServicesList />", () => {
                 .toHaveBeenCalledWith('BleManagerDisconnectPeripheral', expect.any(Function));
     });
 
+    it("should register listener for scan ended", async () => {
+        await expect(emitterMock.addListener)
+                .toHaveBeenCalledWith('BleManagerStopScan', expect.any(Function));
+    });
 
     it("should add a new peripheral on discovery", async () => {
         act( () =>{ callLastRegisteredPeripheralDiscoverListener(emitterMock.addListener, mockPeripheral);} );

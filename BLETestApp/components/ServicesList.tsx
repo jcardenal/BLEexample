@@ -51,14 +51,16 @@ const ServicesList = () => {
                     BleManager.getDiscoveredPeripherals([SERVICE_UUID])
                           .then((peripheralsArray) => {
                               console.log("Already discovered peripherals");
-                              peripheralsArray.forEach(p => {
-                                    console.log(`${p.id} - ${p.name}`);
-                                    if (! peripherals.has(p.id) ) {
-                                        const peripheral = { ...p, connected: false };
-                                        peripherals.set(peripheral.id, peripheral);
-                                    }
-                              }  );
-                              setPeripherals(new Map(peripherals));
+                              if (peripheralsArray.length > 0) {
+                                  peripheralsArray.forEach(p => {
+                                        console.log(`${p.id} - ${p.name}`);
+                                        if (! peripherals.has(p.id) ) {
+                                            const peripheral = { ...p, connected: false };
+                                            peripherals.set(peripheral.id, peripheral);
+                                        }
+                                  }  );
+                                  setPeripherals(new Map(peripherals));
+                              }
                           });
           });
     }, []);
