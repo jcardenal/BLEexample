@@ -1,11 +1,12 @@
 import React from 'react';
-import {act, render, waitForElement} from 'react-native-testing-library';
+import {act, flushMicrotasksQueue, render, waitForElement} from 'react-native-testing-library';
 import ServicesList from '../ServicesList';
 import BatteryService from '../BatteryService';
 import {EmitterContext} from '../../App';
 import BleManager from 'react-native-ble-manager';
 
-jest.mock('react-native-ble-manager', () => ({ retrieveServices: jest.fn(() => Promise.resolve('peripheral info')) }));
+jest.mock('react-native-ble-manager', () => ({ retrieveServices: jest.fn(() => Promise.resolve('peripheral info')),
+                                               getDiscoveredPeripherals: jest.fn() }));
 
 jest.mock('../BatteryService', () => jest.fn( () => null));
 jest.mock("react-native", () => {
@@ -79,14 +80,31 @@ describe("<ServicesList />", () => {
 
     it("should add a new peripheral on discovery", async () => {
         act( () =>{ callLastRegisteredPeripheralDiscoverListener(emitterMock.addListener, mockPeripheral);} );
+        await flushMicrotasksQueue();
         await expect(BatteryService).toHaveBeenCalledWith({peripheral: mockPeripheral, connected: false, onRemoval: expect.any(Function)}, {});
         await expect(BatteryService).toHaveBeenCalledTimes(1);
+    })
+
+    it("should add a previously discovered peripheral on scan stop", async () => {
+        BleManager.getDiscoveredPeripherals.mockImplementation((services_array) => Promise.resolve([mockPeripheral]));
+        act( () =>{ callLastRegisteredScanStopListener(emitterMock.addListener, mockPeripheral);} );
+        await flushMicrotasksQueue();
+        await expect(BatteryService).toHaveBeenCalledWith({peripheral: mockPeripheral, connected: false, onRemoval: expect.any(Function)}, {});
+        await expect(BatteryService).toHaveBeenCalledTimes(1);
+    })
+
+    it("should not add any previously discovered peripheral on scan stop", async () => {
+        BleManager.getDiscoveredPeripherals.mockImplementation((services_array) => Promise.resolve([]));
+        act( () =>{ callLastRegisteredScanStopListener(emitterMock.addListener, mockPeripheral);} );
+        await flushMicrotasksQueue();
+        await expect(BatteryService).not.toHaveBeenCalled();
     })
 
     it("should render new peripheral connection", async () => {
         act( () =>{ callLastRegisteredPeripheralDiscoverListener(emitterMock.addListener, mockPeripheral);} );
         const mockConnectedPeripheral = {...mockPeripheral, connected: true};
         act( () =>{ callLastRegisteredPeripheralConnectionListener(emitterMock.addListener, mockConnectedPeripheral.id);} );
+        await flushMicrotasksQueue();
         await expect(BatteryService).toHaveBeenLastCalledWith({peripheral: mockConnectedPeripheral, connected: true, onRemoval: expect.any(Function)}, {});
         await expect(BatteryService).toHaveBeenCalledTimes(2);
     })
@@ -103,6 +121,7 @@ describe("<ServicesList />", () => {
         const mockConnectedPeripheral = {...mockPeripheral, connected: true};
         act( () =>{ callLastRegisteredPeripheralConnectionListener(emitterMock.addListener, mockConnectedPeripheral.id);} );
         act( () =>{ callLastRegisteredPeripheralDisconnectionListener(emitterMock.addListener, mockPeripheral.id);} );
+        await flushMicrotasksQueue();
         await expect(BatteryService).toHaveBeenLastCalledWith({peripheral: mockPeripheral, connected: false, onRemoval: expect.any(Function)}, {});
         await expect(BatteryService).toHaveBeenCalledTimes(3);
     })
@@ -125,6 +144,12 @@ const callLastRegisteredPeripheralDisconnectionListener = (mock, peripheralId) =
         const lastCall = findLastListenerCallFor('BleManagerDisconnectPeripheral', mock);
         const disconnectPeripheralListener = mock.mock.calls[lastCall][1];
         disconnectPeripheralListener({peripheral: peripheralId, status: 0});
+};
+
+const callLastRegisteredScanStopListener = mock => {
+        const lastCall = findLastListenerCallFor('BleManagerStopScan', mock);
+        const scanStop = mock.mock.calls[lastCall][1];
+        scanStop();
 };
 
 const findLastListenerCallFor =  (listenerName, mock) => {
