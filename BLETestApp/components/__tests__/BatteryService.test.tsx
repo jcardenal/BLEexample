@@ -249,4 +249,27 @@ describe("<BatteryService />", () => {
         })
 
     })
+
+    describe("when battery level is provided", () => {
+        let container;
+        const removalCallbackMock = jest.fn();
+        const batteryLevel = 87;
+
+        beforeEach(() => {
+          container = render(
+                <BatteryService peripheral={mockPeripheral}
+                            connected={true}
+                            onRemoval={removalCallbackMock}
+                            level={batteryLevel}/>
+              );
+        });
+
+        afterEach(cleanup);
+
+        it("should display battery level",  () => {
+            expect(container.getByText(`Battery: ${batteryLevel}%`)).toBeTruthy();
+        })
+
+    })
+
 })

@@ -7,8 +7,8 @@ import Buffer from 'buffer';
 export const SERVICE_UUID = "180F";
 export const CHARACTERISTIC_UUID = "2A19";
 
-const BatteryService = ({peripheral, connected, onRemoval}) => {
-    const [percentage, setPercentage] = useState<String>("unknown")
+const BatteryService = ({peripheral, connected, onRemoval, level}) => {
+    const [percentage, setPercentage] = useState<String>(level ? `${level}%` : "unknown")
     const [isNotifying, setIsNotifying] = useState<Boolean>(false);
 
     const getButtonText = () =>  (connected ? "DISCONNECT" : "CONNECT")

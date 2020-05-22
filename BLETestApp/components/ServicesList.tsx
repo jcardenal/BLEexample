@@ -1,8 +1,9 @@
 import React, {useState, useEffect, useContext} from 'react';
 import {ScrollView, Text, StyleSheet} from 'react-native'
-import BatteryService, {SERVICE_UUID} from './BatteryService';
+import BatteryService, {SERVICE_UUID, CHARACTERISTIC_UUID} from './BatteryService';
 import BleManager from 'react-native-ble-manager';
 import {EmitterContext} from '../App';
+import Buffer from 'buffer';
 
 const ServicesList = () => {
     const emitter = useContext(EmitterContext);
@@ -65,6 +66,19 @@ const ServicesList = () => {
                               }
                           });
           });
+
+          emitter.addListener('BleManagerDidUpdateValueForCharacteristic', ({value, peripheral, characteristic, service}) => {
+                  console.log("Characteristic value changed in peripheralId: ", peripheral, characteristic, service, value);
+                  if ((characteristic === CHARACTERISTIC_UUID) &&
+                      (service === SERVICE_UUID) &&
+                      ( peripherals.has(peripheral.id) )) {
+                      const buffer = Buffer.Buffer.from(value);
+                      const batteryLevel = buffer.readUInt8(0,true);
+                      const p = { ...peripheral, connected: true, level: batteryLevel };
+                      setPeripherals(new Map(peripherals.set(p.id, p)));
+                  }
+          });
+
     }, []);
 
     const drawPeripherals = () => {
@@ -72,6 +86,7 @@ const ServicesList = () => {
                     <BatteryService key={k}
                         peripheral={peripherals.get(k)}
                         connected={peripherals.get(k).connected}
+                        level={peripherals.get(k).level}
                         onRemoval={removePeripheral}
                     />));
     }
