@@ -1,5 +1,5 @@
 import React from 'react';
-import {render} from 'react-native-testing-library';
+import {render, cleanup} from 'react-native-testing-library';
 import MainView from '../MainView';
 import ServicesList from '../ServicesList';
 
@@ -20,6 +20,9 @@ jest.mock("react-native", () => {
 });
 
 describe("<MainView />", () => {
+
+    afterEach(cleanup);
+
     describe("Structural tests", () => {
         it("should render App", () => {
             render( <MainView /> );

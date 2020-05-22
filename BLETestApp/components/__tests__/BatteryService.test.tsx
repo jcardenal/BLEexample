@@ -1,7 +1,7 @@
 import React from 'react';
 import '@testing-library/jest-native/extend-expect';
-import {act, fireEvent, render, waitForElement} from 'react-native-testing-library';
-import BatteryService from '../BatteryService';
+import {act, cleanup, fireEvent, flushMicrotasksQueue, render, waitForElement} from 'react-native-testing-library';
+import BatteryService, {SERVICE_UUID, CHARACTERISTIC_UUID} from '../BatteryService';
 import * as BleManager from 'react-native-ble-manager';
 
 jest.mock('react-native-ble-manager', () => ({ connect: jest.fn(() => Promise.resolve()),
@@ -12,6 +12,9 @@ jest.mock('react-native-ble-manager', () => ({ connect: jest.fn(() => Promise.re
                                                    return Promise.resolve(uint8);
                                                }),
                                                removePeripheral: jest.fn(() => Promise.resolve()),
+                                               startNotification: jest.fn(() => Promise.resolve()),
+                                               stopNotification: jest.fn(() => Promise.resolve()),
+                                               retrieveServices: jest.fn(() => Promise.resolve()),
                                              }));
 
 const mockPeripheral = {
@@ -37,6 +40,9 @@ describe("<BatteryService />", () => {
         BleManager.disconnect.mockClear();
         BleManager.read.mockClear();
         BleManager.removePeripheral.mockClear();
+        BleManager.startNotification.mockClear();
+        BleManager.stopNotification.mockClear();
+        BleManager.retrieveServices.mockClear();
         jest.useFakeTimers();
     });
 
@@ -48,6 +54,8 @@ describe("<BatteryService />", () => {
                 <BatteryService peripheral={noNamedMockPeripheral} connected={false}/>
               );
         });
+
+        afterEach(cleanup);
 
         it("should render component", () => {
             expect(container).toBeTruthy();
@@ -74,6 +82,50 @@ describe("<BatteryService />", () => {
             fireEvent.press(container.getByText("CONNECT"));
             await expect(BleManager.connect).toHaveBeenCalledWith(mockPeripheral.id);
         })
+
+        describe("When peripheral supports notifications in characteristic", () => {
+
+            let mockPeripheralSupportingNotifications;
+
+            beforeEach(() => {
+              const notifiable = {  characteristic: '2a19',
+                                   properties: { Notify: 'Notify', Read: 'Read' },
+                                   service: '180f' };
+              mockPeripheralSupportingNotifications = {...mockPeripheral, characteristics: [notifiable]};
+              container = render(
+                      <BatteryService peripheral={mockPeripheralSupportingNotifications} connected={false}/>
+                    );
+            });
+
+            afterEach(cleanup);
+
+            it("should render toggle notifications disabled", () => {
+                expect(container.getByText("Notify me!")).toBeTruthy()
+                expect(container.getByTestId("toggleSwitch")).toBeDisabled()
+            })
+        })
+
+        describe("When peripheral doesn't support notifications in characteristic", () => {
+            let mockPeripheralSupportingNotifications;
+
+            beforeEach(() => {
+              const nonNotifiable = {  characteristic: '2a19',
+                                   properties: { Read: 'Read' },
+                                   service: '180f' };
+              mockPeripheralNotSupportingNotifications = {...mockPeripheral, characteristics: [nonNotifiable]};
+              container = render(
+                      <BatteryService peripheral={mockPeripheralNotSupportingNotifications} connected={false}/>
+                    );
+            });
+
+            afterEach(cleanup);
+
+            it("should not render toggle notifications", () => {
+                expect(container.queryByText("Notify me!")).toBeNull()
+                expect(container.queryByTestId("toggleSwitch")).toBeNull()
+            })
+
+        })
     })
 
     describe("When peripheral is connected", () => {
@@ -86,6 +138,7 @@ describe("<BatteryService />", () => {
                         );
         });
 
+        afterEach(cleanup);
 
         it("should enable 'READ'", () => {
             expect(container.getByText("READ")).toBeTruthy()
@@ -111,6 +164,65 @@ describe("<BatteryService />", () => {
             fireEvent.press(container.getByText("DISCONNECT"));
             await expect(BleManager.disconnect).toHaveBeenCalledWith(mockPeripheral.id);
         })
+
+        describe("When peripheral supports notifications in characteristic", () => {
+
+            let mockPeripheralSupportingNotifications;
+
+            beforeEach(() => {
+              const notifiable = {  characteristic: '2a19',
+                                   properties: { Notify: 'Notify', Read: 'Read' },
+                                   service: '180f' };
+              mockPeripheralSupportingNotifications = {...mockPeripheral, characteristics: [notifiable]};
+              container = render(
+                      <BatteryService peripheral={mockPeripheralSupportingNotifications} connected={true}/>
+                    );
+            });
+
+            afterEach(cleanup);
+
+            it("should render toggle notifications enabled", () => {
+                expect(container.getByText("Notify me!")).toBeTruthy()
+                expect(container.getByTestId("toggleSwitch")).not.toBeDisabled()
+            })
+
+            it("should start notifications when toggled to 'ON'", async () => {
+                fireEvent(container.getByTestId("toggleSwitch"), 'valueChange', true);
+                await flushMicrotasksQueue();
+                await expect(BleManager.retrieveServices).toHaveBeenCalledWith(mockPeripheral.id, [SERVICE_UUID]);
+                await expect(BleManager.startNotification).toHaveBeenCalledWith(mockPeripheral.id, SERVICE_UUID, CHARACTERISTIC_UUID);
+            })
+
+            it("should stop notifications when toggled to 'OFF'", async () => {
+                fireEvent(container.getByTestId("toggleSwitch"), 'valueChange', false);
+                await flushMicrotasksQueue();
+                await expect(BleManager.stopNotification).toHaveBeenCalledWith(mockPeripheral.id, SERVICE_UUID, CHARACTERISTIC_UUID);
+            })
+
+        })
+
+        describe("When peripheral doesn't support notifications in characteristic", () => {
+            let mockPeripheralSupportingNotifications;
+
+            beforeEach(() => {
+              const nonNotifiable = {  characteristic: '2a19',
+                                   properties: { Read: 'Read' },
+                                   service: '180f' };
+              mockPeripheralNotSupportingNotifications = {...mockPeripheral, characteristics: [nonNotifiable]};
+              container = render(
+                      <BatteryService peripheral={mockPeripheralNotSupportingNotifications} connected={true}/>
+                    );
+            });
+
+            afterEach(cleanup);
+
+            it("should not render toggle notifications", () => {
+                expect(container.queryByText("Notify me!")).toBeNull()
+                expect(container.queryByTestId("toggleSwitch")).toBeNull()
+            })
+
+        })
+
     })
 
     describe("when removing peripheral", () => {
@@ -122,6 +234,8 @@ describe("<BatteryService />", () => {
                 <BatteryService peripheral={noNamedMockPeripheral} connected={false} onRemoval={removalCallbackMock} />
               );
         });
+
+        afterEach(cleanup);
 
         it("should disconnect and remove peripheral", async () => {
             fireEvent.press(container.getByText("REMOVE"));

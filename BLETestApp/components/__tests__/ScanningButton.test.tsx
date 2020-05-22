@@ -1,5 +1,5 @@
 import React from 'react';
-import {act, fireEvent, render, waitForElement} from 'react-native-testing-library';
+import {act, cleanup, fireEvent, render, waitForElement} from 'react-native-testing-library';
 import ScanningButton, {SCAN_PERIOD_IN_SECONDS} from '../ScanningButton';
 import BleManager from 'react-native-ble-manager';
 import {EmitterContext} from '../../App';
@@ -37,6 +37,8 @@ describe("<ScanningButton />", () => {
             </EmitterContext.Provider>
          );
     });
+
+    afterEach(cleanup);
 
     it("should show 'START SCAN'", async () => {
         expect(container.getByText("START SCAN")).toBeTruthy();

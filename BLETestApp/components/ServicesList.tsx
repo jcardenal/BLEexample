@@ -17,6 +17,8 @@ const ServicesList = () => {
                     BleManager.retrieveServices(peripheralId)
                         .then((peripheralInfo) => {
                             console.log('Peripheral Info: ', peripheralInfo);
+                            peripheral = {...peripheralInfo, connected: status};
+                            setPeripherals(new Map(peripherals.set(peripheralId, peripheral)));
                         });
                 }
             }

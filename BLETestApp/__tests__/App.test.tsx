@@ -1,5 +1,5 @@
 import React from 'react';
-import {render, flushMicrotasksQueue} from 'react-native-testing-library';
+import {render, flushMicrotasksQueue, cleanup} from 'react-native-testing-library';
 import App, {bleManagerEmitter} from '../App';
 import * as BleManager from 'react-native-ble-manager';
 import * as ReactNative from 'react-native';
@@ -34,6 +34,8 @@ describe("<App />", () => {
         beforeEach(() => {
             ReactNative.BackHandler.exitApp.mockClear();
         });
+
+        afterEach(cleanup);
 
         it("should render App", () => {
             render( <App /> );

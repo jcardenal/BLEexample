@@ -1,14 +1,16 @@
 import React, {useState, useEffect, useContext} from 'react';
-import {Text, StyleSheet, View} from 'react-native';
+import {Text, StyleSheet, Switch, View} from 'react-native';
 import { Button } from 'react-native-material-ui';
 import BleManager from 'react-native-ble-manager';
 import Buffer from 'buffer';
 
 export const SERVICE_UUID = "180F";
-const CHARACTERISTIC_UUID = "2A19";
+export const CHARACTERISTIC_UUID = "2A19";
 
 const BatteryService = ({peripheral, connected, onRemoval}) => {
     const [percentage, setPercentage] = useState<String>("unknown")
+    const [isNotifying, setIsNotifying] = useState<Boolean>(false);
+
     const getButtonText = () =>  (connected ? "DISCONNECT" : "CONNECT")
 
     const handleConnectButtonPressed = async () => {
@@ -38,10 +40,52 @@ const BatteryService = ({peripheral, connected, onRemoval}) => {
         onRemoval(peripheral.id);
     }
 
+    const supportsNotification = characteristics => {
+        result = (characteristics !== undefined) && characteristics.filter( c => (c.service === '180f') && (c.characteristic === '2a19') && (c.properties.Notify === 'Notify')).length > 0 ;
+        console.log('Considering Characteristics: ', characteristics);
+        console.log('Characteristic supports notification: ', result);
+        return result;
+    };
+
+    const manageNotificationSubscriptions = async (shouldNotify) => {
+             if (shouldNotify) {
+               console.log("Starting notification reception");
+               await BleManager.retrieveServices(peripheral.id, [SERVICE_UUID]);
+               await BleManager.startNotification(peripheral.id, SERVICE_UUID, CHARACTERISTIC_UUID);
+             } else {
+               console.log("Stopping notification reception")
+               await BleManager.stopNotification(peripheral.id, SERVICE_UUID, CHARACTERISTIC_UUID);
+             }
+        };
+
+    const toggleSwitch = (value) => {
+                setIsNotifying(value);
+                manageNotificationSubscriptions(value);
+          };
+
     return (
     <View style={styles.container}>
         <Text style={styles.baseText} >{peripheral.name ? peripheral.name : 'N/A'}</Text>
         <Text style={styles.batteryText} >Battery: {percentage}</Text>
+        {
+          supportsNotification(peripheral.characteristics) ?
+          (
+           <>
+            <Switch
+                testID="toggleSwitch"
+                trackColor={{ false: "#767577", true: "#81b0ff" }}
+                thumbColor={isNotifying ? "#f5dd4b" : "#f4f3f4"}
+                ios_backgroundColor="#3e3e3e"
+                onValueChange={toggleSwitch}
+                value={isNotifying}
+                disabled={!connected}
+            />
+            <Text>Notify me!</Text>
+           </>
+          )
+          : null
+        }
+
         <Button primary raised text={getButtonText()} onPress={handleConnectButtonPressed} />
         <Button disabled={!connected} accent raised text="read" onPress={handleReadButton}/>
         <Button raised text="remove" onPress={handleRemoveButton} />

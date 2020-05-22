@@ -1,11 +1,11 @@
 import React from 'react';
-import {act, flushMicrotasksQueue, render, waitForElement} from 'react-native-testing-library';
+import {act, cleanup, flushMicrotasksQueue, render, waitForElement} from 'react-native-testing-library';
 import ServicesList from '../ServicesList';
 import BatteryService from '../BatteryService';
 import {EmitterContext} from '../../App';
 import BleManager from 'react-native-ble-manager';
 
-jest.mock('react-native-ble-manager', () => ({ retrieveServices: jest.fn(() => Promise.resolve('peripheral info')),
+jest.mock('react-native-ble-manager', () => ({ retrieveServices: jest.fn(() => Promise.resolve()),
                                                getDiscoveredPeripherals: jest.fn() }));
 
 jest.mock('../BatteryService', () => jest.fn( () => null));
@@ -54,6 +54,8 @@ describe("<ServicesList />", () => {
         );
     });
 
+    afterEach(cleanup);
+
     it("should render an empty list", () => {
         expect(BatteryService).not.toHaveBeenCalled();
     })
@@ -101,12 +103,13 @@ describe("<ServicesList />", () => {
     })
 
     it("should render new peripheral connection", async () => {
-        act( () =>{ callLastRegisteredPeripheralDiscoverListener(emitterMock.addListener, mockPeripheral);} );
         const mockConnectedPeripheral = {...mockPeripheral, connected: true};
+        BleManager.retrieveServices.mockImplementation(() => Promise.resolve(mockPeripheral));
+        act( () =>{ callLastRegisteredPeripheralDiscoverListener(emitterMock.addListener, mockPeripheral);} );
         act( () =>{ callLastRegisteredPeripheralConnectionListener(emitterMock.addListener, mockConnectedPeripheral.id);} );
         await flushMicrotasksQueue();
         await expect(BatteryService).toHaveBeenLastCalledWith({peripheral: mockConnectedPeripheral, connected: true, onRemoval: expect.any(Function)}, {});
-        await expect(BatteryService).toHaveBeenCalledTimes(2);
+        await expect(BatteryService).toHaveBeenCalledTimes(3);
     })
 
     it("should should issue `retrieveServices` on peripheral connection", async () => {
@@ -117,13 +120,16 @@ describe("<ServicesList />", () => {
     })
 
     it("should render new peripheral disconnection", async () => {
-        act( () =>{ callLastRegisteredPeripheralDiscoverListener(emitterMock.addListener, mockPeripheral);} );
         const mockConnectedPeripheral = {...mockPeripheral, connected: true};
+        BleManager.retrieveServices.mockImplementation(() => Promise.resolve(mockPeripheral));
+        act( () =>{ callLastRegisteredPeripheralDiscoverListener(emitterMock.addListener, mockPeripheral);} );
+        await flushMicrotasksQueue();
         act( () =>{ callLastRegisteredPeripheralConnectionListener(emitterMock.addListener, mockConnectedPeripheral.id);} );
+        await flushMicrotasksQueue();
         act( () =>{ callLastRegisteredPeripheralDisconnectionListener(emitterMock.addListener, mockPeripheral.id);} );
         await flushMicrotasksQueue();
         await expect(BatteryService).toHaveBeenLastCalledWith({peripheral: mockPeripheral, connected: false, onRemoval: expect.any(Function)}, {});
-        await expect(BatteryService).toHaveBeenCalledTimes(3);
+        await expect(BatteryService).toHaveBeenCalledTimes(4);
     })
 
 })
