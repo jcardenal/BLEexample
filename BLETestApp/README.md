@@ -33,7 +33,7 @@ following a phased approach:
 * [x] Check if location permit has been granted by user (see below). Exit app if refused by user
 * [x] Add REMOVE button to remove discovered peripherals
 * [ ] Do not allow operations on peripherals while scanning
-* [ ] Subscribe to notifications regarding change in battery level
+* [x] Subscribe to notifications regarding change in battery level
 * [ ] Control (write) the blinking frequency of the on-board blue led of the peripheral using a slider
 * [ ] Display errors (as `Toast`s or similar)
 

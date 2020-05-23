@@ -3,6 +3,8 @@ import '@testing-library/jest-native/extend-expect';
 import {act, cleanup, fireEvent, flushMicrotasksQueue, render, waitForElement} from 'react-native-testing-library';
 import BatteryService, {SERVICE_UUID, CHARACTERISTIC_UUID} from '../BatteryService';
 import * as BleManager from 'react-native-ble-manager';
+import {EmitterContext} from '../../App';
+
 
 jest.mock('react-native-ble-manager', () => ({ connect: jest.fn(() => Promise.resolve()),
                                                disconnect: jest.fn(() => Promise.resolve()),
@@ -16,6 +18,23 @@ jest.mock('react-native-ble-manager', () => ({ connect: jest.fn(() => Promise.re
                                                stopNotification: jest.fn(() => Promise.resolve()),
                                                retrieveServices: jest.fn(() => Promise.resolve()),
                                              }));
+
+jest.mock("react-native", () => {
+    const ReactNative = jest.requireActual('react-native');
+
+    return Object.setPrototypeOf(
+        {
+          NativeModules: {
+            ...ReactNative.NativeModules,
+            BleManager: jest.fn()
+          },
+          NativeEventEmitter: jest.fn(() => ({addListener: jest.fn() }) ),
+        },
+        ReactNative
+      );
+});
+
+const emitterMock = {addListener: jest.fn()}
 
 const mockPeripheral = {
                          id: '00-11-22',
@@ -51,8 +70,10 @@ describe("<BatteryService />", () => {
         const noNamedMockPeripheral = {...mockPeripheral, name: undefined};
         beforeEach(() => {
           container = render(
-                <BatteryService peripheral={noNamedMockPeripheral} connected={false}/>
-              );
+                    <EmitterContext.Provider value={emitterMock}>
+                       <BatteryService peripheral={noNamedMockPeripheral} connected={false}/>
+                    </EmitterContext.Provider>
+                  );
         });
 
         afterEach(cleanup);
@@ -83,6 +104,12 @@ describe("<BatteryService />", () => {
             await expect(BleManager.connect).toHaveBeenCalledWith(mockPeripheral.id);
         })
 
+        it("should register BLE listener for characteristic change notification", async () => {
+            await expect(emitterMock.addListener)
+                    .toHaveBeenCalledWith('BleManagerDidUpdateValueForCharacteristic', expect.any(Function));
+        });
+
+
         describe("When peripheral supports notifications in characteristic", () => {
 
             let mockPeripheralSupportingNotifications;
@@ -93,7 +120,9 @@ describe("<BatteryService />", () => {
                                    service: '180f' };
               mockPeripheralSupportingNotifications = {...mockPeripheral, characteristics: [notifiable]};
               container = render(
-                      <BatteryService peripheral={mockPeripheralSupportingNotifications} connected={false}/>
+                      <EmitterContext.Provider value={emitterMock}>
+                        <BatteryService peripheral={mockPeripheralSupportingNotifications} connected={false}/>
+                      </EmitterContext.Provider>
                     );
             });
 
@@ -114,7 +143,9 @@ describe("<BatteryService />", () => {
                                    service: '180f' };
               mockPeripheralNotSupportingNotifications = {...mockPeripheral, characteristics: [nonNotifiable]};
               container = render(
-                      <BatteryService peripheral={mockPeripheralNotSupportingNotifications} connected={false}/>
+                      <EmitterContext.Provider value={emitterMock}>
+                        <BatteryService peripheral={mockPeripheralNotSupportingNotifications} connected={false}/>
+                      </EmitterContext.Provider>
                     );
             });
 
@@ -134,7 +165,9 @@ describe("<BatteryService />", () => {
         beforeEach(() => {
           const mockConnectedPeripheral = {...mockPeripheral, connected: true};
           container = render(
-                            <BatteryService peripheral={mockConnectedPeripheral} connected={true} />
+                            <EmitterContext.Provider value={emitterMock}>
+                                <BatteryService peripheral={mockConnectedPeripheral} connected={true} />
+                            </EmitterContext.Provider>
                         );
         });
 
@@ -175,7 +208,9 @@ describe("<BatteryService />", () => {
                                    service: '180f' };
               mockPeripheralSupportingNotifications = {...mockPeripheral, characteristics: [notifiable]};
               container = render(
-                      <BatteryService peripheral={mockPeripheralSupportingNotifications} connected={true}/>
+                      <EmitterContext.Provider value={emitterMock}>
+                            <BatteryService peripheral={mockPeripheralSupportingNotifications} connected={true}/>
+                      </EmitterContext.Provider>
                     );
             });
 
@@ -199,6 +234,26 @@ describe("<BatteryService />", () => {
                 await expect(BleManager.stopNotification).toHaveBeenCalledWith(mockPeripheral.id, SERVICE_UUID, CHARACTERISTIC_UUID);
             })
 
+            it("should render new value characteristic for peripheral", async () => {
+                jest.useRealTimers();
+                const value = 37;
+                const uint8 = new Uint8Array(1);
+                uint8[0] = value;
+                act( () =>{ callLastRegisteredCharacteristicValueChangeListener(emitterMock.addListener, uint8, mockPeripheral.id, CHARACTERISTIC_UUID,SERVICE_UUID);} );
+                await flushMicrotasksQueue();
+                await waitForElement(() => container.getByText(`Battery: ${value}%`));
+            })
+
+            it("should ignore new value characteristic for peripheral", async () => {
+                jest.useRealTimers();
+                const value = 37;
+                const uint8 = new Uint8Array(1);
+                uint8[0] = value;
+                act( () =>{ callLastRegisteredCharacteristicValueChangeListener(emitterMock.addListener, uint8, mockPeripheral.id, "AA00",SERVICE_UUID);} );
+                await flushMicrotasksQueue();
+                await waitForElement(() => container.getByText("Battery: unknown"));
+            })
+
         })
 
         describe("When peripheral doesn't support notifications in characteristic", () => {
@@ -210,7 +265,9 @@ describe("<BatteryService />", () => {
                                    service: '180f' };
               mockPeripheralNotSupportingNotifications = {...mockPeripheral, characteristics: [nonNotifiable]};
               container = render(
-                      <BatteryService peripheral={mockPeripheralNotSupportingNotifications} connected={true}/>
+                      <EmitterContext.Provider value={emitterMock}>
+                        <BatteryService peripheral={mockPeripheralNotSupportingNotifications} connected={true}/>
+                      </EmitterContext.Provider>
                     );
             });
 
@@ -231,7 +288,9 @@ describe("<BatteryService />", () => {
         const removalCallbackMock = jest.fn();
         beforeEach(() => {
           container = render(
-                <BatteryService peripheral={noNamedMockPeripheral} connected={false} onRemoval={removalCallbackMock} />
+                <EmitterContext.Provider value={emitterMock}>
+                    <BatteryService peripheral={noNamedMockPeripheral} connected={false} onRemoval={removalCallbackMock} />
+                </EmitterContext.Provider>
               );
         });
 
@@ -250,26 +309,18 @@ describe("<BatteryService />", () => {
 
     })
 
-    describe("when battery level is provided", () => {
-        let container;
-        const removalCallbackMock = jest.fn();
-        const batteryLevel = 87;
-
-        beforeEach(() => {
-          container = render(
-                <BatteryService peripheral={mockPeripheral}
-                            connected={true}
-                            onRemoval={removalCallbackMock}
-                            level={batteryLevel}/>
-              );
-        });
-
-        afterEach(cleanup);
-
-        it("should display battery level",  () => {
-            expect(container.getByText(`Battery: ${batteryLevel}%`)).toBeTruthy();
-        })
-
-    })
-
 })
+
+const callLastRegisteredCharacteristicValueChangeListener = (mock, value, peripheral, characteristic, service) => {
+        const lastCall = findLastListenerCallFor('BleManagerDidUpdateValueForCharacteristic', mock);
+        const characteristicChangeListener = mock.mock.calls[lastCall][1];
+        characteristicChangeListener({value, peripheral, characteristic, service});
+};
+
+
+const findLastListenerCallFor =  (listenerName, mock) => {
+      const callsFound = mock.mock.calls.map( (call, index) => call[0] == listenerName ? index : undefined);
+      const callsFiltered = callsFound.filter(x => x !== undefined);
+      const lastCall = callsFiltered.slice(-1)[0];
+      return lastCall;
+};

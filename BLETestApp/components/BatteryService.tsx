@@ -3,13 +3,30 @@ import {Text, StyleSheet, Switch, View} from 'react-native';
 import { Button } from 'react-native-material-ui';
 import BleManager from 'react-native-ble-manager';
 import Buffer from 'buffer';
+import {EmitterContext} from '../App';
 
 export const SERVICE_UUID = "180F";
 export const CHARACTERISTIC_UUID = "2A19";
 
-const BatteryService = ({peripheral, connected, onRemoval, level}) => {
-    const [percentage, setPercentage] = useState<String>(level ? `${level}%` : "unknown")
+const BatteryService = ({peripheral, connected, onRemoval}) => {
+    const emitter = useContext(EmitterContext);
+
+    const [percentage, setPercentage] = useState<String>("unknown")
     const [isNotifying, setIsNotifying] = useState<Boolean>(false);
+
+
+    useEffect(() => {
+          emitter.addListener('BleManagerDidUpdateValueForCharacteristic', (args) => {
+                  console.log("Characteristic value changed in peripheralId: ", args.peripheral, args.characteristic, args.service, args.value);
+                  if ((extractFromUUID(args.characteristic) === CHARACTERISTIC_UUID) &&
+                      (extractFromUUID(args.service) === SERVICE_UUID) &&
+                      ( peripheral.id === args.peripheral)) {
+                      const buffer = Buffer.Buffer.from(args.value);
+                      const batteryLevel = buffer.readUInt8(0,true);
+                      setPercentage(`${batteryLevel}%`);
+                  }
+          });
+    }, [])
 
     const getButtonText = () =>  (connected ? "DISCONNECT" : "CONNECT")
 
@@ -42,8 +59,6 @@ const BatteryService = ({peripheral, connected, onRemoval, level}) => {
 
     const supportsNotification = characteristics => {
         result = (characteristics !== undefined) && characteristics.filter( c => (c.service === '180f') && (c.characteristic === '2a19') && (c.properties.Notify === 'Notify')).length > 0 ;
-        console.log('Considering Characteristics: ', characteristics);
-        console.log('Characteristic supports notification: ', result);
         return result;
     };
 
@@ -56,12 +71,12 @@ const BatteryService = ({peripheral, connected, onRemoval, level}) => {
                console.log("Stopping notification reception")
                await BleManager.stopNotification(peripheral.id, SERVICE_UUID, CHARACTERISTIC_UUID);
              }
-        };
+    };
 
     const toggleSwitch = (value) => {
                 setIsNotifying(value);
                 manageNotificationSubscriptions(value);
-          };
+    };
 
     return (
     <View style={styles.container}>
@@ -116,5 +131,6 @@ const styles = StyleSheet.create({
   }
 });
 
+const extractFromUUID = uuid => uuid && uuid.split("-")[0].slice(-4).toUpperCase()
 
 export default BatteryService;

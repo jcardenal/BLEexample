@@ -80,11 +80,6 @@ describe("<ServicesList />", () => {
                 .toHaveBeenCalledWith('BleManagerStopScan', expect.any(Function));
     });
 
-    it("should register BLE listener for characteristic change notification", async () => {
-        await expect(emitterMock.addListener)
-                .toHaveBeenCalledWith('BleManagerDidUpdateValueForCharacteristic', expect.any(Function));
-    });
-
     it("should add a new peripheral on discovery", async () => {
         act( () =>{ callLastRegisteredPeripheralDiscoverListener(emitterMock.addListener, mockPeripheral);} );
         await flushMicrotasksQueue();
@@ -137,33 +132,6 @@ describe("<ServicesList />", () => {
         await expect(BatteryService).toHaveBeenCalledTimes(4);
     })
 
-    it("should render new value characteristic for peripheral", async () => {
-        const value = 37;
-        const uint8 = new Uint8Array(1);
-        uint8[0] = value;
-        const mockConnectedPeripheral = {...mockPeripheral, connected: true, level: value};
-        BleManager.retrieveServices.mockImplementation(() => Promise.resolve(mockPeripheral));
-        act( () =>{ callLastRegisteredPeripheralDiscoverListener(emitterMock.addListener, mockPeripheral);} );
-        await flushMicrotasksQueue();
-        act( () =>{ callLastRegisteredCharacteristicValueChangeListener(emitterMock.addListener, uint8, mockPeripheral, CHARACTERISTIC_UUID,SERVICE_UUID);} );
-        await flushMicrotasksQueue();
-        await expect(BatteryService).toHaveBeenLastCalledWith({peripheral: mockConnectedPeripheral, connected: true, onRemoval: expect.any(Function), level: value}, {});
-        await expect(BatteryService).toHaveBeenCalledTimes(2);
-    })
-
-    it("should ignore new value characteristic for peripheral", async () => {
-        const value = 37;
-        const uint8 = new Uint8Array(1);
-        uint8[0] = value;
-        const mockConnectedPeripheral = {...mockPeripheral, connected: true, level: value};
-        BleManager.retrieveServices.mockImplementation(() => Promise.resolve(mockPeripheral));
-        act( () =>{ callLastRegisteredPeripheralDiscoverListener(emitterMock.addListener, mockPeripheral);} );
-        await flushMicrotasksQueue();
-        act( () =>{ callLastRegisteredCharacteristicValueChangeListener(emitterMock.addListener, uint8, mockPeripheral, "AA00",SERVICE_UUID);} );
-        await flushMicrotasksQueue();
-        await expect(BatteryService).not.toHaveBeenLastCalledWith({peripheral: mockConnectedPeripheral, connected: true, onRemoval: expect.any(Function), level: value}, {});
-        await expect(BatteryService).toHaveBeenCalledTimes(1);
-    })
 
 })
 
@@ -189,12 +157,6 @@ const callLastRegisteredScanStopListener = mock => {
         const lastCall = findLastListenerCallFor('BleManagerStopScan', mock);
         const scanStop = mock.mock.calls[lastCall][1];
         scanStop();
-};
-
-const callLastRegisteredCharacteristicValueChangeListener = (mock, value, peripheral, characteristic, service) => {
-        const lastCall = findLastListenerCallFor('BleManagerDidUpdateValueForCharacteristic', mock);
-        const characteristicChangeListener = mock.mock.calls[lastCall][1];
-        characteristicChangeListener({value, peripheral, characteristic, service});
 };
 
 
