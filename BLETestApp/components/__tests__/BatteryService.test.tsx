@@ -254,6 +254,15 @@ describe("<BatteryService />", () => {
                 await waitForElement(() => container.getByText("Battery: unknown"));
             })
 
+            it("should stop notifications when DISCONNECT pressed while notifications are ON", async () => {
+                fireEvent(container.getByTestId("toggleSwitch"), 'valueChange', true);
+                await flushMicrotasksQueue();
+                fireEvent.press(container.getByText("DISCONNECT"));
+                await flushMicrotasksQueue();
+                await expect(BleManager.stopNotification).toHaveBeenCalledWith(mockPeripheral.id, SERVICE_UUID, CHARACTERISTIC_UUID);
+                await expect(container.getByTestId("toggleSwitch")).toHaveProp('value', false);
+            })
+
         })
 
         describe("When peripheral doesn't support notifications in characteristic", () => {

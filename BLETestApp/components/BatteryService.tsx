@@ -36,6 +36,10 @@ const BatteryService = ({peripheral, connected, onRemoval}) => {
 
     const handleConnectButtonPressed = async () => {
         if (connected) {
+            if (isNotifying) {
+               await BleManager.stopNotification(peripheral.id, SERVICE_UUID, CHARACTERISTIC_UUID);
+               setIsNotifying(false);
+            }
             await BleManager.disconnect(peripheral.id);
         } else {
             await BleManager.connect(peripheral.id);
