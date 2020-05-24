@@ -93,10 +93,10 @@ const BatteryService = ({peripheral, connected, onRemoval}) => {
             <Switch
                 testID="toggleSwitch"
                 trackColor={{ false: "#767577", true: "#81b0ff" }}
-                thumbColor={isNotifying ? "#f5dd4b" : "#f4f3f4"}
+                thumbColor={isNotifying && connected ? "#f5dd4b" : "#f4f3f4"}
                 ios_backgroundColor="#3e3e3e"
                 onValueChange={toggleSwitch}
-                value={isNotifying}
+                value={isNotifying && connected}
                 disabled={!connected}
             />
             <Text>Notify me!</Text>
