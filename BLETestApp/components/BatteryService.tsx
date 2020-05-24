@@ -8,6 +8,12 @@ import {EmitterContext} from '../App';
 export const SERVICE_UUID = "180F";
 export const CHARACTERISTIC_UUID = "2A19";
 
+const decodeBytes = readData => {
+      const buffer = Buffer.Buffer.from(readData);
+      const decoded = buffer.readUInt8(0,true);
+      return decoded;
+};
+
 const BatteryService = ({peripheral, connected, onRemoval}) => {
     const emitter = useContext(EmitterContext);
 
@@ -21,9 +27,7 @@ const BatteryService = ({peripheral, connected, onRemoval}) => {
                   if ((extractFromUUID(args.characteristic) === CHARACTERISTIC_UUID) &&
                       (extractFromUUID(args.service) === SERVICE_UUID) &&
                       ( peripheral.id === args.peripheral)) {
-                      const buffer = Buffer.Buffer.from(args.value);
-                      const batteryLevel = buffer.readUInt8(0,true);
-                      setPercentage(`${batteryLevel}%`);
+                      setPercentage(`${decodeBytes(args.value)}%`);
                   }
           });
     }, [])
@@ -42,9 +46,7 @@ const BatteryService = ({peripheral, connected, onRemoval}) => {
         BleManager.read(peripheral.id, SERVICE_UUID, CHARACTERISTIC_UUID)
             .then((readData) => {
                 console.log("Read: ", readData);
-                const buffer = Buffer.Buffer.from(readData);
-                const batteryLevel = buffer.readUInt8(0,true);
-                setPercentage(`${batteryLevel}%`);
+                setPercentage(`${decodeBytes(readData)}%`);
             })
             .catch((error) => {
                 console.log("Error reading:", error);
@@ -58,8 +60,10 @@ const BatteryService = ({peripheral, connected, onRemoval}) => {
     }
 
     const supportsNotification = characteristics => {
-        result = (characteristics !== undefined) && characteristics.filter( c => (c.service === '180f') && (c.characteristic === '2a19') && (c.properties.Notify === 'Notify')).length > 0 ;
-        return result;
+        return (characteristics !== undefined) &&
+                        characteristics.filter( c => (c.service === '180f') &&
+                        (c.characteristic === '2a19') &&
+                        (c.properties.Notify === 'Notify')).length > 0 ;
     };
 
     const manageNotificationSubscriptions = async (shouldNotify) => {
