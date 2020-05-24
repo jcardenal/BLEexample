@@ -93,7 +93,8 @@ const BatteryService = ({peripheral, connected, onRemoval}) => {
         {
           supportsNotification(peripheral.characteristics) ?
           (
-           <>
+           <View style={styles.innerContainer}>
+            <Text>Notify me!</Text>
             <Switch
                 testID="toggleSwitch"
                 trackColor={{ false: "#767577", true: "#81b0ff" }}
@@ -103,15 +104,15 @@ const BatteryService = ({peripheral, connected, onRemoval}) => {
                 value={isNotifying && connected}
                 disabled={!connected}
             />
-            <Text>Notify me!</Text>
-           </>
+          </View>
           )
           : null
         }
-
-        <Button primary raised text={getButtonText()} onPress={handleConnectButtonPressed} />
-        <Button disabled={!connected} accent raised text="read" onPress={handleReadButton}/>
-        <Button raised text="remove" onPress={handleRemoveButton} />
+        <View style={styles.buttonsContainer}>
+            <Button primary raised text={getButtonText()} onPress={handleConnectButtonPressed} />
+            <Button disabled={!connected} accent raised text="read" onPress={handleReadButton}/>
+            <Button raised text="remove" onPress={handleRemoveButton} />
+        </View>
     </View>
     )
 }
@@ -132,9 +133,19 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "space-between",
+    alignItems: "center",
     borderColor: "green",
-    borderWidth: 1,
+    borderWidth: 2,
     borderRadius: 20,
+    padding: 10,
+  },
+  innerContainer: {
+    flex: 1,
+    flexDirection: "row",
+  },
+  buttonsContainer: {
+    flex: 1,
+    justifyContent: "space-evenly",
     padding: 10,
   }
 });
