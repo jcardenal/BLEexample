@@ -2,6 +2,7 @@
 
 Two projects are created:
 
+
 * **Peripheral**, where the BLE peripheral is going to be created
 * **BLETestApp**, an _Android_ application to access the data in the peripheral
 
